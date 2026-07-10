@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí Comms — GAA Communications Assistant</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0a0f0a;
+      font-family: 'Georgia', serif;
+      color: #e8e4d9;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a3a1a 0%, #0d200d 50%, #0a150a 100%);
+      border-bottom: 3px solid #c8a84b;
+      padding: 32px 24px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(200,168,75,.03) 40px, rgba(200,168,75,.03) 80px);
+      pointer-events: none;
+    }
+
+    .header-inner { max-width: 780px; margin: 0 auto; position: relative; }
+
+    .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+
+    .crest {
+      width: 44px; height: 44px;
+      background: #c8a84b;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-eyebrow { font-size: 11px; letter-spacing: 0.2em; color: #c8a84b; text-transform: uppercase; font-family: monospace; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; color: #f0ead8; line-height: 1.1; }
+    .header-sub { margin: 8px 0 0 56px; font-size: 14px; color: #8a9e8a; font-style: italic; }
+
+    .main { max-width: 780px; margin: 0 auto; padding: 28px 20px 48px; }
+
+    /* MODE SWITCHER */
+    .mode-switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .mode-switch-btn {
+      padding: 14px 16px;
+      background: #111811;
+      border: 1px solid #2a3a2a;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mode-switch-btn::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: #2a3a2a;
+      transition: background 0.15s ease;
+    }
+
+    .mode-switch-btn.active {
+      background: #1a2e1a;
+      border-color: #4a7a4a;
+    }
+
+    .mode-switch-btn.active::before { background: #c8a84b; }
+
+    .mode-switch-icon { font-size: 1.25rem; margin-bottom: 4px; }
+
+    .mode-switch-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #d4cfc4;
+      margin-bottom: 2px;
+      font-family: monospace;
+    }
+
+    .mode-switch-btn.active .mode-switch-title { color: #c8a84b; }
+
+    .mode-switch-sub { font-size: 0.6875rem; color: #5a7a5a; line-height: 1.3; }
+
+    /* FORM CARD */
+    .form-card {
+      background: #111811;
+      border: 1px solid #2a3a2a;
+      border-radius: 12px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+
+    .form-section-title {
+      margin: 0 0 20px;
+      font-size: 16px;
+      color: #c8a84b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+    .field { margin-bottom: 14px; }
+
+    .field-label {
+      display: block;
+      font-size: 11px;
+      color: #6a8a6a;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-family: monospace;
+      margin-bottom: 6px;
+    }
+
+    .field select,
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0d150d;
+      border: 1px solid #2a3a2a;
+      border-radius: 6px;
+      color: #d4cfc4;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.12s ease;
+    }
+
+    .field select:focus,
+    .field input:focus,
+    .field textarea:focus { border-color: #c8a84b; }
+
+    .field textarea { resize: vertical; }
+
+    .score-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+    .score-half { display: grid; gap: 8px; }
+    .score-half.home { grid-template-columns: 1fr auto; }
+    .score-half.away { grid-template-columns: auto 1fr; }
+    .score-input { width: 64px !important; }
+    .vs-label { text-align: center; color: #c8a84b; font-weight: 700; font-size: 18px; }
+
+    .error-box {
+      background: #2a1010;
+      border: 1px solid #8b2020;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      color: #e88080;
+      font-size: 14px;
+      display: none;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #c8a84b, #a88838);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #0a0f0a;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: Georgia, serif;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    .generate-btn:disabled { background: #2a3a2a; color: #5a7a5a; cursor: not-allowed; }
+
+    /* OUTPUT */
+    .output-card {
+      background: #111811;
+      border: 1px solid #2a3a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: fadeIn 0.4s ease;
+      display: none;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .tabs { display: flex; border-bottom: 1px solid #2a3a2a; overflow-x: auto; }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 8px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #5a7a5a;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active { background: #1a2e1a; color: #c8a84b; border-bottom-color: #c8a84b; }
+
+    .output-body { padding: 24px; }
+
+    .output-text {
+      background: #0d150d;
+      border: 1px solid #1e2e1e;
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: #d4cfc4;
+      white-space: pre-wrap;
+      min-height: 160px;
+    }
+
+    .output-actions { margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px; }
+
+    .copy-btn, .share-btn {
+      padding: 10px 20px;
+      background: #1e2e1e;
+      border: 1px solid #3a4a3a;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #8aaa8a;
+      font-family: monospace;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn.copied { background: #1a3a1a; border-color: #4a8a4a; color: #6acc6a; }
+
+    .share-btn {
+      background: #c8a84b;
+      border-color: #c8a84b;
+      color: #0a0f0a;
+      font-weight: 700;
+    }
+
+    .share-btn:hover { background: #a88838; border-color: #a88838; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(0,0,0,.2);
+      border-top-color: #0a0f0a;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer { text-align: center; margin-top: 28px; font-size: 12px; color: #3a5a3a; font-family: monospace; }
+    .footer-wordmark { color: #5a7a5a; }
+    .footer-accent { color: #c8a84b; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-row">
+        <div class="crest" style="font-family: Georgia, serif; font-size: 22px; font-weight: 700; color: #0a0f0a; letter-spacing: -0.05em;">C</div>
+        <div>
+          <div class="header-eyebrow">Croí Comms</div>
+          <h1>Comms Assistant</h1>
+        </div>
+      </div>
+      <p class="header-sub">Match reports, club news &amp; social posts — publish-ready in seconds.</p>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- MODE SWITCHER -->
+    <div class="mode-switcher">
+      <button class="mode-switch-btn active" id="btnMatch" onclick="switchMode('match')">
+        <div class="mode-switch-icon">🏐</div>
+        <div class="mode-switch-title">Match Report</div>
+        <div class="mode-switch-sub">Scores, scorers & key moments</div>
+      </button>
+      <button class="mode-switch-btn" id="btnAnnouncement" onclick="switchMode('announcement')">
+        <div class="mode-switch-icon">📣</div>
+        <div class="mode-switch-title">Club Announcement</div>
+        <div class="mode-switch-sub">Events, news & club updates</div>
+      </button>
+    </div>
+
+    <!-- MATCH FORM -->
+    <div class="form-card" id="matchForm">
+      <h2 class="form-section-title">Match Details</h2>
+
+      <div class="grid-2">
+        <div class="field">
+          <label class="field-label">County</label>
+          <select id="county"></select>
+        </div>
+        <div class="field">
+          <label class="field-label">Competition</label>
+          <select id="competition"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Round</label>
+        <select id="round"></select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Teams &amp; Score (Format: 1-12)</label>
+        <div class="score-row">
+          <div class="score-half home">
+            <input type="text" id="homeTeam" placeholder="Home Team" />
+            <input type="text" id="homeScore" placeholder="1-12" class="score-input" />
+          </div>
+          <div class="vs-label">v</div>
+          <div class="score-half away">
+            <input type="text" id="awayScore" placeholder="0-15" class="score-input" />
+            <input type="text" id="awayTeam" placeholder="Away Team" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Scorers</label>
+        <textarea id="scorers" rows="2" placeholder="e.g. Walsh 1-3, Murphy 0-4 (3f), O'Brien 0-2..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Key Moments (optional)</label>
+        <textarea id="keyMoments" rows="2" placeholder="e.g. Red card 52 mins, injury time winner, dominant second half..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Conditions (optional)</label>
+        <input type="text" id="weather" placeholder="e.g. Heavy rain, strong wind, excellent surface" />
+      </div>
+
+      <div class="error-box" id="matchError"></div>
+      <button class="generate-btn" id="matchBtn" onclick="generateMatch()">Generate Content →</button>
+    </div>
+
+    <!-- ANNOUNCEMENT FORM -->
+    <div class="form-card hidden" id="announcementForm">
+      <h2 class="form-section-title">Club Announcement</h2>
+
+      <div class="field">
+        <label class="field-label">What is this about?</label>
+        <input type="text" id="announcementTopic" placeholder="e.g. Lotto draw, grounds development, upcoming fundraiser, player achievement, club event..." />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Key Details</label>
+        <textarea id="announcementDetails" rows="5" placeholder="Tell me the key information — dates, times, venues, amounts, names, what people need to know or do..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Tone</label>
+        <select id="announcementTone">
+          <option>Warm &amp; Community-Focused</option>
+          <option>Exciting &amp; Energetic</option>
+          <option>Formal &amp; Informational</option>
+          <option>Grateful &amp; Celebratory</option>
+        </select>
+      </div>
+
+      <div class="error-box" id="announcementError"></div>
+      <button class="generate-btn" id="announcementBtn" onclick="generateAnnouncement()">Generate Content →</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-card" id="outputCard">
+      <div class="tabs" id="outputTabs"></div>
+      <div class="output-body">
+        <div class="output-text" id="outputText"></div>
+        <div class="output-actions">
+          <button class="copy-btn" id="copyBtn" onclick="copyContent()">Copy</button>
+          <button class="share-btn" id="shareBtn" onclick="shareContent()" style="display: navigator.share ? 'block' : 'none'">↑ Share</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span class="footer-wordmark">Cro<span class="footer-accent">í</span></span> · Built for GAA clubs.
+    </footer>
+
+  </div>
+
+<script>
+  const API_KEY = "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";
+
+  const COUNTIES = [
+    "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down",
+    "Dublin","Fermanagh","Galway","Kerry","Kildare","Kilkenny","Laois","Leitrim",
+    "Limerick","Longford","Louth","Mayo","Meath","Monaghan","Offaly","Roscommon",
+    "Sligo","Tipperary","Tyrone","Waterford","Westmeath","Wexford","Wicklow"
+  ];
+
+  const COMPETITIONS = [
+    "Senior Football Championship","Senior Hurling Championship",
+    "Junior Football Championship","Junior Hurling Championship",
+    "Ladies Football Championship","Camogie Championship",
+    "U20 Football Championship","U20 Hurling Championship",
+    "Minor Football Championship","Minor Hurling Championship",
+    "National Football League","National Hurling League","Club Championship","Féile"
+  ];
+
+  const ROUNDS = [
+    "Round 1","Round 2","Round 3","Quarter-Final","Semi-Final","Final",
+    "Replay","Group Stage","Preliminary Round"
+  ];
+
+  function populateSelect(id, options, defaultVal) {
+    const el = document.getElementById(id);
+    options.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o; opt.textContent = o;
+      if (o === defaultVal) opt.selected = true;
+      el.appendChild(opt);
+    });
+  }
+
+  populateSelect("county", COUNTIES, "Galway");
+  populateSelect("competition", COMPETITIONS, "Senior Football Championship");
+  populateSelect("round", ROUNDS, "Semi-Final");
+
+  let currentMode = "match";
+  let output = null;
+  let activeTab = 0;
+
+  function switchMode(mode) {
+    currentMode = mode;
+    output = null;
+    document.getElementById("outputCard").style.display = "none";
+
+    document.getElementById("btnMatch").classList.toggle("active", mode === "match");
+    document.getElementById("btnAnnouncement").classList.toggle("active", mode === "announcement");
+    document.getElementById("matchForm").classList.toggle("hidden", mode !== "match");
+    document.getElementById("announcementForm").classList.toggle("hidden", mode !== "announcement");
+  }
+
+  function val(id) { return document.getElementById(id)?.value?.trim() || ""; }
+
+  function showError(id, msg) {
+    const box = document.getElementById(id);
+    box.textContent = msg;
+    box.style.display = msg ? "block" : "none";
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span> Generating…' : "Generate Content →";
+  }
+
+  const MATCH_TABS = [
+    { key: "report", label: "📰 Match Report" },
+    { key: "social", label: "📱 Social Post" },
+    { key: "press",  label: "📻 Press Release" }
+  ];
+
+  const ANNOUNCEMENT_TABS = [
+    { key: "post",      label: "📱 Social Post" },
+    { key: "whatsapp",  label: "💬 WhatsApp" },
+    { key: "newsletter",label: "📧 Newsletter" }
+  ];
+
+  function renderTabs(tabs) {
+    const container = document.getElementById("outputTabs");
+    container.innerHTML = tabs.map((t, i) =>
+      `<button class="tab-btn ${i === 0 ? 'active' : ''}"
+               onclick="selectTab(${i}, this)">${t.label}</button>`
+    ).join("");
+  }
+
+  function selectTab(i, btn) {
+    activeTab = i;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tabs = currentMode === "match" ? MATCH_TABS : ANNOUNCEMENT_TABS;
+    if (output) document.getElementById("outputText").textContent = output[tabs[i].key] || "";
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn.textContent = "Copy to clipboard";
+    copyBtn.classList.remove("copied");
+  }
+
+  function showOutput(tabs) {
+    renderTabs(tabs);
+    activeTab = 0;
+    document.getElementById("outputText").textContent = output[tabs[0].key] || "";
+    document.getElementById("outputCard").style.display = "block";
+  }
+
+  function copyContent() {
+    const text = document.getElementById("outputText")?.textContent || "";
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "✓ Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+    });
+  }
+
+  async function shareContent() {
+    if (!navigator.share) return;
+    const text = document.getElementById("outputText")?.textContent || "";
+    const tabs = currentMode === "match" ? MATCH_TABS : ANNOUNCEMENT_TABS;
+    const label = tabs[activeTab]?.label?.replace(/^\S+\s/, "") || "Content";
+    try {
+      await navigator.share({ title: `Croí Comms — ${label}`, text });
+    } catch (e) {
+      // User cancelled — do nothing
+    }
+  }
+
+  async function generateMatch() {
+    const county      = val("county");
+    const competition = val("competition");
+    const round       = val("round");
+    const homeTeam    = val("homeTeam");
+    const awayTeam    = val("awayTeam");
+    const homeScore   = val("homeScore");
+    const awayScore   = val("awayScore");
+    const scorers     = val("scorers");
+    const keyMoments  = val("keyMoments");
+    const weather     = val("weather");
+
+    if (!homeTeam || !awayTeam || !homeScore || !awayScore) {
+      showError("matchError", "Please fill in both team names and scores.");
+      return;
+    }
+    showError("matchError", "");
+    setLoading("matchBtn", true);
+    output = null;
+    document.getElementById("outputCard").style.display = "none";
+
+    const winner = homeScore > awayScore ? homeTeam : awayScore > homeScore ? awayTeam : null;
+
+    const prompt = `You are a GAA county board communications officer writing content for ${county} GAA.
+
+Match details:
+- Competition: ${competition} — ${round}
+- ${homeTeam} ${homeScore} vs ${awayTeam} ${awayScore}
+- ${winner ? `Winner: ${winner}` : "Result: Draw"}
+- Scorers: ${scorers || "Not provided"}
+- Key moments: ${keyMoments || "Not provided"}
+- Conditions: ${weather || "Not provided"}
+
+Generate THREE pieces of content. Return ONLY valid JSON, no markdown, no backticks:
+{
+  "report": "Full match report. 400-500 words. Third person. Formal GAA style suitable for county website and local newspapers. Reference county, competition context, and result clearly. Include scorers if provided.",
+  "social": "Social media post. Max 280 chars. Punchy. Include score. Relevant hashtags like #GAA #${county.replace(/\s/g,'')}GAA. Appropriate emoji.",
+  "press": "Press release. Formal structure: headline, dateline, opening paragraph with who/what/when/where, body with match detail and quotes placeholder [QUOTE], closing with contact info placeholder. 300-400 words."
+}`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1500,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.find(b => b.type === "text")?.text || "";
+      output = JSON.parse(text.replace(/```json|```/g, "").trim());
+      showOutput(MATCH_TABS);
+    } catch (e) {
+      showError("matchError", "Generation failed. Check your connection and try again.");
+    }
+    setLoading("matchBtn", false);
+  }
+
+  async function generateAnnouncement() {
+    const topic   = val("announcementTopic");
+    const details = val("announcementDetails");
+    const tone    = val("announcementTone");
+
+    if (!topic || !details) {
+      showError("announcementError", "Please fill in what this is about and the key details.");
+      return;
+    }
+    showError("announcementError", "");
+    setLoading("announcementBtn", true);
+    output = null;
+    document.getElementById("outputCard").style.display = "none";
+
+    const prompt = `You are a GAA club communications officer writing content for the club's social media, WhatsApp group, and newsletter.
+
+Announcement topic: ${topic}
+Key details: ${details}
+Tone: ${tone}
+
+Generate THREE pieces of content. Return ONLY valid JSON, no markdown, no backticks:
+{
+  "post": "A social media post for Facebook/Instagram/X. Engaging, community-focused. Include relevant emoji. 150-200 words. Tone: ${tone}.",
+  "whatsapp": "A WhatsApp group message. Short, friendly, mobile-readable. Short paragraphs. Plain language. Cover only what members need to know or do. Under 100 words. Tone: ${tone}.",
+  "newsletter": "A newsletter or website article version. More detailed. Well-structured with a clear opening, body, and call to action if relevant. 250-350 words. Tone: ${tone}."
+}`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1500,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.find(b => b.type === "text")?.text || "";
+      output = JSON.parse(text.replace(/```json|```/g, "").trim());
+      showOutput(ANNOUNCEMENT_TABS);
+    } catch (e) {
+      showError("announcementError", "Generation failed. Check your connection and try again.");
+    }
+    setLoading("announcementBtn", false);
+  }
+</script>
+</body>
+</html>

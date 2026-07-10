@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí — Digital tools for modern GAA clubs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #FFFFFF;
+      --surface:   #F7F8F6;
+      --border:    #E4E7E1;
+      --text:      #1A1A1A;
+      --muted:     #6B7280;
+      --green:     #1A5C38;
+      --green-lt:  #EBF2EE;
+      --gold:      #C9A84C;
+      --radius:    10px;
+      --shadow:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-hv: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 48px 24px 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wordmark {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .wordmark span {
+      color: var(--gold);
+    }
+
+    .tagline {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── TOOL GRID ── */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    @media (min-width: 640px) {
+      .tool-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--border);
+      transition: background 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hv);
+      border-color: #C8D5CC;
+    }
+
+    .card:hover::before {
+      background: var(--green);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--green);
+      background: var(--green-lt);
+      border: 1px solid #C6DACC;
+      border-radius: 6px;
+      padding: 7px 14px;
+      text-decoration: none;
+      width: fit-content;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .card-btn:hover {
+      background: #DAEADE;
+      border-color: #A8C8B0;
+    }
+
+    .card-btn svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    /* ── COMING SOON ── */
+    .coming-soon-section {
+      margin-bottom: 48px;
+    }
+
+    .coming-card {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .coming-icon {
+      font-size: 1.375rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .coming-content {}
+
+    .coming-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .coming-desc {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 0 40px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    .footer-wordmark {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+
+    .footer-wordmark span { color: var(--gold); }
+
+    .footer-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="wordmark">Cro<span>í</span></div>
+    <p class="tagline">Digital tools for modern GAA clubs.</p>
+  </header>
+
+  <main>
+
+    <!-- TOOLS -->
+    <p class="section-label">Your tools</p>
+
+    <div class="tool-grid">
+
+      <!-- COACH -->
+      <div class="card">
+        <div class="card-icon">🏑</div>
+        <div class="card-name">Croí Coach</div>
+        <p class="card-desc">Generate complete, pathway-aligned training sessions in seconds — built specifically for Gaelic Games.</p>
+        <a class="card-btn" href="https://croi-coach.glide.page" target="_blank" rel="noopener">
+          Open Coach
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- COMMS -->
+      <div class="card">
+        <div class="card-icon">📰</div>
+        <div class="card-name">Croí Comms</div>
+        <p class="card-desc">Generate match reports, social media posts and club communications — publish-ready in seconds.</p>
+        <a class="card-btn" href="https://croi-comms.vercel.app/" target="_blank" rel="noopener">
+          Open Comms
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- CLERK -->
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-name">Croí Clerk</div>
+        <p class="card-desc">AI assistant for club secretaries — meeting minutes, correspondence and committee administration.</p>
+        <a class="card-btn" href="https://croi-clerk.vercel.app/" target="_blank" rel="noopener">
+          Open Clerk
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- COMING SOON -->
+    <div class="coming-soon-section">
+      <p class="section-label">Coming soon</p>
+      <div class="coming-card">
+        <div class="coming-icon">🧠</div>
+        <div class="coming-content">
+          <div class="coming-name">Club Intelligence</div>
+          <p class="coming-desc">One AI assistant connected across coaching, communications and administration — understanding your club's context across every tool.</p>
+          <span class="badge">Launching 2027</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-wordmark">Cro<span>í</span></div>
+    <p class="footer-sub">Built for volunteer GAA clubs.</p>
+  </footer>
+
+</body>
+</html>
