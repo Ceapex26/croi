@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Croí Coach — Session Builder</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+
+:root{
+  --navy:#0D1F3C;
+  --navy2:#081528;
+  --teal:#2A8C6E;
+  --teal-lt:#E8F5F1;
+  --teal-bd:#B8DDD4;
+  --gold:#C9A84C;
+  --gold-lt:#FDF6E3;
+  --gold-bd:#E8D5A0;
+  --green:#1A5C38;
+  --cream:#F7F8F6;
+  --white:#FFFFFF;
+  --card:#FFFFFF;
+  --border:#E2E8E4;
+  --border2:#CDD5D0;
+  --text:#111827;
+  --muted:#6B7280;
+  --faint:#9CA3AF;
+  --error:#DC2626;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.06);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── WRAP ── */
+.wrap{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(160deg,var(--navy),var(--navy2));
+  padding:10px 14px 0;
+  flex:0 0 auto;
+  box-shadow:0 4px 14px rgba(8,26,48,.3);
+  z-index:20;
+}
+
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+
+/* Shield/crest */
+.crest{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 0 2px var(--gold);
+}
+.crest svg{width:18px;height:18px}
+
+.header-id{min-width:0;flex:1}
+.header-title{
+  font-weight:800;font-size:13px;color:#fff;
+  line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.header-sub{font-size:10px;font-weight:600;color:#8EA0B8;letter-spacing:.04em;margin-top:1px}
+
+/* Clock area */
+.clock-area{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.start-btn{
+  background:var(--gold);color:var(--navy);
+  border:0;font-weight:800;font-size:12px;letter-spacing:.02em;
+  padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;
+}
+.start-btn:active{transform:scale(.97)}
+.clock-live{display:flex;align-items:center;gap:7px}
+.clock-elapsed{font-weight:800;font-size:18px;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.clock-left{font-size:10px;color:var(--gold);font-weight:700;white-space:nowrap;max-width:72px;line-height:1.2}
+.icon-btn{
+  width:30px;height:30px;border:0;border-radius:7px;cursor:pointer;
+  background:rgba(255,255,255,.14);color:#fff;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:active{transform:scale(.96)}
+
+/* Nav jump */
+.nav-jump{
+  display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;
+  -webkit-overflow-scrolling:touch;
+}
+.nav-jump::-webkit-scrollbar{display:none}
+.nav-jump a{
+  flex:0 0 auto;font-weight:700;font-size:11px;letter-spacing:.02em;
+  color:#B7C4D6;background:rgba(255,255,255,.08);
+  padding:6px 11px;border-radius:7px;text-decoration:none;
+  white-space:nowrap;cursor:pointer;transition:background .15s,color .15s;
+}
+.nav-jump a.active{background:var(--gold);color:var(--navy)}
+
+/* Progress bar */
+.prog-bar{height:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .35s}
+
+/* ── FORM SCREEN ── */
+.form-screen{
+  flex:1;overflow-y:auto;padding:16px 14px 100px;
+  -webkit-overflow-scrolling:touch;
+}
+.form-screen::-webkit-scrollbar{display:none}
+
+.form-intro{margin-bottom:18px}
+.form-intro-title{font-weight:700;font-size:1rem;color:var(--navy);margin-bottom:2px}
+.form-intro-sub{font-size:.8125rem;color:var(--muted)}
+
+.btn-group{margin-bottom:16px}
+.btn-group-label{
+  font-size:.625rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px;display:block;
+}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.btn-grid.c3{grid-template-columns:1fr 1fr 1fr}
+.btn-grid.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+
+.opt{
+  padding:11px 6px;background:var(--white);
+  border:1.5px solid var(--border);border-radius:8px;
+  cursor:pointer;font-family:inherit;font-size:.875rem;font-weight:500;
+  color:var(--muted);text-align:center;line-height:1.3;
+  transition:all .12s;
+}
+.opt:active{transform:scale(.97)}
+.opt.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+
+.ctx-label{
+  font-size:.625rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;display:block;
+}
+.ctx-label span{font-weight:400;text-transform:none;letter-spacing:0;color:var(--faint)}
+.ctx-ta{
+  width:100%;padding:10px 12px;background:var(--white);
+  border:1.5px solid var(--border);border-radius:8px;
+  font-family:inherit;font-size:.9375rem;line-height:1.5;
+  color:var(--text);outline:none;resize:none;min-height:68px;
+  transition:border-color .12s;
+}
+.ctx-ta:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,140,110,.08)}
+
+.error-box{
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;
+  padding:10px 14px;margin-bottom:12px;color:var(--error);
+  font-size:.875rem;display:none;
+}
+
+/* ── STICKY BUILD BAR ── */
+.sticky-build{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(247,248,246,.95);
+  backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+  z-index:30;
+  max-width:480px;margin:0 auto;
+}
+.build-btn{
+  width:100%;padding:14px;background:var(--navy);color:#fff;
+  border:0;border-radius:10px;font-family:inherit;font-size:1rem;
+  font-weight:700;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:background .15s;
+}
+.build-btn:disabled{opacity:.4;cursor:not-allowed}
+.build-btn:not(:disabled):active{transform:scale(.99)}
+.build-hint{text-align:center;font-size:.75rem;color:var(--faint);margin-top:5px}
+.build-hint.ready{color:var(--green);font-weight:600}
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SESSION SCREEN ── */
+.session-screen{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* swipe deck */
+.deck{flex:1;min-height:0;overflow:hidden;position:relative;touch-action:pan-y}
+.track{display:flex;height:100%;will-change:transform}
+.slide{
+  flex:0 0 100%;width:100%;height:100%;
+  overflow-y:auto;overflow-x:hidden;
+  padding:14px 13px 20px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.slide::-webkit-scrollbar{display:none}
+
+/* dots */
+.dots{
+  flex:0 0 auto;display:flex;gap:5px;justify-content:center;
+  padding:7px 0 5px;background:var(--cream);
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:.2s}
+.dot.on{background:var(--navy);width:18px;border-radius:3px}
+
+/* action bar */
+.action-bar{
+  flex:0 0 auto;background:var(--card);border-top:1px solid var(--border);
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+}
+.action-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px}
+.aBtn{
+  border:1.5px solid var(--border2);background:var(--cream);color:var(--navy);
+  font-family:inherit;font-weight:700;font-size:.875rem;
+  padding:12px 8px;border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.aBtn:active{transform:scale(.98)}
+.aBtn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── INFO SLIDE ── */
+.info-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.info-tag{
+  font-weight:700;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--navy);background:var(--white);border:1px solid var(--border);
+  padding:4px 9px;border-radius:6px;
+}
+.info-tag.gold{border-color:var(--gold-bd);background:var(--gold-lt);color:#7A5F1A}
+.info-h1{font-weight:800;font-size:21px;line-height:1.2;color:var(--navy);margin-bottom:6px}
+.swipe-hint{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  color:var(--muted);font-size:12px;font-weight:600;margin:10px 0 14px;
+}
+.swipe-hint svg{width:15px;height:15px;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+
+.info-box{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:13px 15px;box-shadow:var(--shadow);margin-bottom:10px;
+}
+.info-box-title{
+  font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:8px;
+}
+.info-box ul{list-style:none;display:grid;gap:5px}
+.info-box li{font-size:13px;padding-left:16px;position:relative;color:var(--text)}
+.info-box li::before{
+  content:"";position:absolute;left:2px;top:7px;
+  width:6px;height:6px;border-radius:50%;background:var(--gold);
+}
+.info-box.equip li::before{background:var(--navy);border-radius:2px}
+.info-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:var(--muted)}
+.info-meta span{background:var(--white);border:1px solid var(--border);border-radius:7px;padding:7px 10px}
+.info-meta strong{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);margin-bottom:2px}
+
+/* ── ACTIVITY SLIDE ── */
+.act-block{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden;border-left:4px solid var(--border2);
+}
+.act-block.warmup{border-left-color:var(--teal)}
+.act-block.skill{border-left-color:var(--navy)}
+.act-block.game{border-left-color:var(--gold)}
+.act-block.match{border-left-color:var(--green)}
+
+.act-block.now-block{
+  border-left-color:var(--gold)!important;
+  box-shadow:0 0 0 2px var(--gold),var(--shadow);
+}
+.act-block.now-block .act-head{background:linear-gradient(90deg,rgba(201,168,76,.1),transparent)}
+
+.now-badge{
+  display:none;margin-left:8px;font-weight:800;font-size:9px;letter-spacing:.08em;
+  color:var(--navy);background:var(--gold);padding:2px 6px;border-radius:4px;vertical-align:middle;
+}
+.act-block.now-block .now-badge{display:inline}
+
+.act-head{padding:14px 15px 11px;display:flex;align-items:flex-start;gap:11px}
+.act-timing{flex:0 0 auto;text-align:center}
+.act-clock{font-weight:800;font-size:14px;color:var(--navy);white-space:nowrap}
+.act-mins{font-size:10px;color:var(--muted);margin-top:1px}
+.act-mid{flex:1;min-width:0}
+.act-type{
+  font-weight:700;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:3px;
+}
+.act-name{font-weight:700;font-size:16px;line-height:1.25;color:var(--text)}
+.act-name .now-badge{font-size:9px}
+.act-check{
+  flex:0 0 auto;width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  background:#fafaf7;cursor:pointer;transition:.15s;
+}
+.act-check svg{width:12px;height:12px;opacity:0;transition:.15s}
+.act-block.done .act-check{background:var(--teal);border-color:var(--teal)}
+.act-block.done .act-check svg{opacity:1}
+
+.act-body{padding:0 15px 15px}
+.act-idea{
+  font-size:13.5px;color:var(--text);background:#FAF8F2;
+  border-radius:9px;padding:10px 12px;margin-bottom:11px;font-weight:500;line-height:1.5;
+}
+.act-idea b{color:var(--navy)}
+
+.row-label{
+  font-weight:700;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--navy);margin-bottom:5px;
+}
+.act-setup{font-size:13.5px;color:var(--text);margin-bottom:11px;line-height:1.5}
+.runs{list-style:none;display:grid;gap:7px;margin-bottom:11px;counter-reset:r}
+.runs li{
+  font-size:13.5px;padding-left:26px;position:relative;
+  counter-increment:r;color:var(--text);line-height:1.45;
+}
+.runs li::before{
+  content:counter(r);position:absolute;left:0;top:0;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--navy);color:#fff;
+  font-weight:700;font-size:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Watch For */
+.watch-box{
+  background:var(--teal-lt);border-radius:10px;padding:10px 12px;margin-bottom:11px;
+}
+.watch-box .row-label{color:#1C7A6D}
+.watch-list{list-style:none;display:grid;gap:6px}
+.watch-list li{font-size:13px;font-weight:600;color:#14514A;padding-left:14px;position:relative;line-height:1.4}
+.watch-list li::before{content:"\2192";position:absolute;left:0;top:0;color:var(--teal);font-weight:700}
+
+/* Adapt */
+.adapt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.adapt-card{border:1px solid var(--border2);border-radius:9px;padding:9px 11px;font-size:12.5px;line-height:1.4;color:var(--text)}
+.adapt-lbl{font-weight:700;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.adapt-card.easier .adapt-lbl{color:var(--teal)}
+.adapt-card.harder .adapt-lbl{color:#C8703A}
+
+/* Working when */
+.working{
+  display:flex;gap:8px;align-items:flex-start;
+  font-size:13px;color:var(--text);
+  background:var(--cream);border-radius:9px;padding:10px 12px;
+  margin-bottom:11px;line-height:1.45;
+}
+.working svg{flex:0 0 auto;width:15px;height:15px;margin-top:2px}
+.working b{color:var(--navy)}
+
+/* Progression */
+.progression{
+  font-size:12.5px;color:var(--muted);
+  padding-top:10px;border-top:1px dashed var(--border2);
+  line-height:1.4;
+}
+.progression strong{color:var(--navy)}
+
+/* Feedback */
+.fb-wrap{margin-top:13px;padding-top:12px;border-top:1px solid var(--border)}
+.fb-label{font-weight:700;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.fb-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.fb-btn{
+  display:flex;align-items:center;gap:5px;
+  border:1.5px solid var(--border2);background:#FAFAF7;
+  color:var(--muted);font-family:inherit;font-weight:700;font-size:12px;
+  padding:8px 11px;border-radius:9px;cursor:pointer;transition:.12s;
+}
+.fb-btn:active{transform:scale(.96)}
+.fb-btn.up.on{background:var(--teal-lt);border-color:var(--teal);color:#1C7A6D}
+.fb-btn.dn.on{background:#FBECEB;border-color:#D98B84;color:#A3352C}
+.fb-btn.sv{margin-left:auto}
+.fb-btn.sv.on{background:var(--gold-lt);border-color:var(--gold-bd);color:#7A5F1A}
+.reasons{display:none;flex-wrap:wrap;gap:6px;margin-top:8px}
+.reasons.show{display:flex}
+.reason-chip{
+  border:1px solid var(--border2);background:#fff;
+  color:var(--muted);font-size:11.5px;font-weight:600;
+  padding:5px 10px;border-radius:20px;cursor:pointer;
+}
+.reason-chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── CROÍ TIP ── */
+.tip-slide{
+  background:linear-gradient(135deg,var(--gold-lt),#F5EAC8);
+  border:1px solid var(--gold-bd);border-radius:14px;padding:16px;
+  box-shadow:var(--shadow);
+}
+.tip-label{
+  font-weight:800;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:#9A7B23;margin-bottom:8px;display:flex;align-items:center;gap:7px;
+}
+.tip-text{margin:0;font-size:14px;font-style:italic;color:#5C4A1A;line-height:1.6}
+
+/* ── DEBRIEF ── */
+.debrief-card{
+  background:var(--navy);color:#fff;border-radius:14px;
+  padding:18px;box-shadow:var(--shadow);
+}
+.debrief-label{
+  font-weight:800;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;
+}
+.debrief-q{font-size:16px;font-style:italic;color:#E7ECF3;line-height:1.55;margin-bottom:10px}
+.debrief-note{font-size:12.5px;color:#8EA0B8;line-height:1.5}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:90px;
+  background:var(--navy);color:#fff;padding:9px 18px;border-radius:9px;
+  font-size:13px;font-weight:600;opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:50;white-space:nowrap;
+}
+.toast.show{opacity:1}
+
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header id="appHeader">
+    <div class="header-top">
+      <div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1">
+        <div class="crest">
+          <svg viewBox="0 0 48 54" fill="none">
+            <path d="M24 2L44 10V28C44 40 34 50 24 52C14 50 4 40 4 28V10L24 2Z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="1.5"/>
+            <text x="24" y="16" text-anchor="middle" fill="white" font-family="Arial" font-size="7" font-weight="800" letter-spacing="1">CROÍ</text>
+            <line x1="14" y1="24" x2="34" y2="38" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="33" cy="37" rx="3.5" ry="2" transform="rotate(-35 33 37)" stroke="white" stroke-width="1.5" fill="none"/>
+            <line x1="34" y1="24" x2="14" y2="38" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="15" cy="37" rx="3.5" ry="2" transform="rotate(35 15 37)" stroke="white" stroke-width="1.5" fill="none"/>
+            <circle cx="24" cy="31" r="3" fill="#C9A84C"/>
+          </svg>
+        </div>
+        <div class="header-id">
+          <div class="header-title" id="hTitle">Session Builder</div>
+          <div class="header-sub" id="hSub">CROÍ COACH</div>
+        </div>
+      </div>
+      <div class="clock-area" id="clockArea">
+        <button class="start-btn" id="startBtn">▶ Start</button>
+        <div class="clock-live" id="clockLive" hidden>
+          <span class="clock-elapsed" id="clockElapsed">0:00</span>
+          <span class="clock-left" id="clockLeft"></span>
+          <button class="icon-btn" id="pauseBtn">⏸</button>
+          <button class="icon-btn" id="resetBtn">↺</button>
+        </div>
+      </div>
+    </div>
+    <nav class="nav-jump" id="navJump" hidden></nav>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </header>
+
+  <!-- FORM SCREEN -->
+  <div id="formScreen" class="form-screen">
+    <div class="form-intro">
+      <div class="form-intro-title">Build Your Session</div>
+      <div class="form-intro-sub">Tap to set each option — takes about 20 seconds.</div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Code</span>
+      <div class="btn-grid" id="gCode">
+        <button class="opt" onclick="pick('code',this,'Gaelic Football')">Gaelic Football</button>
+        <button class="opt" onclick="pick('code',this,'Hurling')">Hurling</button>
+        <button class="opt" onclick="pick('code',this,'Camogie')">Camogie</button>
+        <button class="opt" onclick="pick('code',this,'Ladies Football')">Ladies Football</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Age Group</span>
+      <div class="btn-grid" id="gAge">
+        <button class="opt" onclick="pick('age',this,'Go Games (U7–U11)')">Go Games<br/>U7–U11</button>
+        <button class="opt" onclick="pick('age',this,'U13–U14')">U13–U14</button>
+        <button class="opt" onclick="pick('age',this,'U15–U17')">U15–U17</button>
+        <button class="opt" onclick="pick('age',this,'Adult')">Adult</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Players</span>
+      <div class="btn-grid c4" id="gPlayers">
+        <button class="opt" onclick="pick('players',this,'Under 10')">Under<br/>10</button>
+        <button class="opt" onclick="pick('players',this,'10–16')">10–16</button>
+        <button class="opt" onclick="pick('players',this,'17–24')">17–24</button>
+        <button class="opt" onclick="pick('players',this,'25+')">25+</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Duration</span>
+      <div class="btn-grid c4" id="gDuration">
+        <button class="opt" onclick="pick('duration',this,'45 minutes')">45<br/>mins</button>
+        <button class="opt" onclick="pick('duration',this,'60 minutes')">60<br/>mins</button>
+        <button class="opt" onclick="pick('duration',this,'75 minutes')">75<br/>mins</button>
+        <button class="opt" onclick="pick('duration',this,'90 minutes')">90<br/>mins</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Session Focus</span>
+      <div class="btn-grid" id="gFocus">
+        <button class="opt" onclick="pick('focus',this,'Skill Development')">Skill Development</button>
+        <button class="opt" onclick="pick('focus',this,'First Touch &amp; Distribution')">First Touch &amp; Distribution</button>
+        <button class="opt" onclick="pick('focus',this,'Shooting &amp; Scoring')">Shooting &amp; Scoring</button>
+        <button class="opt" onclick="pick('focus',this,'Conditioned Games')">Conditioned Games</button>
+        <button class="opt" onclick="pick('focus',this,'Team Play &amp; Support')">Team Play &amp; Support</button>
+        <button class="opt" onclick="pick('focus',this,'Tackling &amp; Defence')">Tackling &amp; Defence</button>
+        <button class="opt" onclick="pick('focus',this,'Match Preparation')">Match Preparation</button>
+        <button class="opt" onclick="pick('focus',this,'Mixed / General')">Mixed / General</button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <span class="btn-group-label">Intensity</span>
+      <div class="btn-grid c3" id="gIntensity">
+        <button class="opt" onclick="pick('intensity',this,'Low — Recovery session')">Low<br/><span style="font-size:.75rem;opacity:.65">Recovery</span></button>
+        <button class="opt on" onclick="pick('intensity',this,'Medium — Standard training')">Medium<br/><span style="font-size:.75rem;opacity:.65">Standard</span></button>
+        <button class="opt" onclick="pick('intensity',this,'High — Pre-match')">High<br/><span style="font-size:.75rem;opacity:.65">Pre-match</span></button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="ctx-label" for="ctx">Anything specific? <span>(optional)</span></label>
+      <textarea class="ctx-ta" id="ctx" placeholder="e.g. Mixed ability, some players lack confidence on weak side. Coming off a defeat last week."></textarea>
+    </div>
+
+    <div class="error-box" id="errBox"></div>
+  </div>
+
+  <!-- SESSION SCREEN -->
+  <div id="sessionScreen" class="session-screen" hidden>
+    <div class="deck" id="deck">
+      <div class="track" id="track"></div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="action-bar">
+      <div class="action-row">
+        <button class="aBtn" id="copyBtn" onclick="copySession()">📋 Copy</button>
+        <button class="aBtn" id="shareBtn" onclick="shareSession()">↑ Share</button>
+        <button class="aBtn primary" onclick="newSession()">＋ New</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY BUILD BUTTON -->
+  <div class="sticky-build" id="stickyBuild">
+    <button class="build-btn" id="buildBtn" onclick="generate()" disabled>
+      ⚡ Build Session
+    </button>
+    <div class="build-hint" id="buildHint">Pick your options to get started</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AI PROFILES & WORKFLOW CONFIGURATION ────────────────────────────────
+const AI_PROFILES = {
+  HIGH_REASONING: "anthropic/claude-sonnet-4-6",
+  BALANCED:       "openai/gpt-4o",
+  FAST:           "google/gemini-flash-1.5",
+  CHEAP:          "meta-llama/llama-3.1-8b-instruct"
+};
+
+const WORKFLOWS = {
+  sessionBuild: { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 3500, temperature: 0.4 }
+};
+
+const OPENROUTER_KEY = "YOUR_OPENROUTER_KEY_HERE";
+
+const SYSTEM_PROMPT = `You are Croí, a Virtual Gaelic Games Coaching Assistant. You help volunteer coaches across Gaelic Football, Hurling, Camogie, and Ladies Gaelic Football plan and run better training sessions.
+
+You are not a template generator. You think like an experienced coach and respond to what each coach actually needs.
+
+WHO YOU ARE
+You speak like a coach who has been on the sideline for years — practical, direct, and genuinely helpful. Never sound like a textbook. Never use sports science jargon.
+Use real coaching language. Do not start responses with "Great choice!" or "Here is your session."
+
+WHAT EVERY SESSION NEEDS
+- A game-based warm-up — ball in hand from minute one, competitive from the start. No jogging laps, no static stretching. Good examples: Ball Tag, Grid Transitions. Never two lines passing to each other.
+- At least one skill or game-based activity building toward the session objective
+- Match play at the end — minimum 10 minutes, always
+
+AGE GROUPS
+U7–U11 (Go Games) — Maximum touches. Small sided games. Fun first. Everyone involved every minute.
+U13–U17 — Technique with decision making. Players solving problems under gradual pressure. Keep it competitive.
+Adult — High intensity. Match realistic. Tactically specific. Fitness through games, not laps.
+
+GAELIC GAMES PLAYER PATHWAY
+Shape every session around: Enjoyment, Challenge, Looks like the Game, All Players Involved, Player Centred, Constant Decision Making.
+Connect the croiTip to a player attribute: Passion, Respect, Responsibility, Commitment, Resilience, Creativity.
+
+SPORT-SPECIFIC
+Gaelic Football — Hand passing, kicking, near hand tackle, shooting, transition. Spatial language: the D, the 45, the square.
+Hurling / Camogie — Striking, first touch, ground striking, lifting the sliotar. Spatial language: the square, the parallelogram, the 20m line. NEVER use football terminology in hurling/camogie sessions.
+Ladies Football — Same as football, emphasis on transition speed.
+
+SESSION DESIGN RULES
+- Game-based learning over isolated drills
+- Max 4 Rule — never more than 4 players in any line. Split into multiple simultaneous grids.
+- No lines, no relays — if players wait, redesign it
+- High touches per minute always
+- Decision making in every activity
+- Conditioned game rules must reflect real GAA play. Never invent physical restrictions.
+- Championship or match this weekend → short and sharp, 45 min max, no fatigue
+
+OUTPUT FORMAT — CRITICAL
+Return ONLY valid JSON. No markdown, no backticks, no preamble:
+{
+  "title": "Short session title",
+  "objective": ["what players will be able to do 1","what players will be able to do 2","what players will be able to do 3"],
+  "equipment": ["item with quantity","item","item"],
+  "pitchArea": "e.g. Half pitch",
+  "setupTime": "e.g. 5 minutes",
+  "activities": [
+    {
+      "type": "warmup",
+      "name": "Activity name",
+      "clock": "0:00–0:10",
+      "mins": "10 mins",
+      "idea": "One sentence — the coaching idea behind this activity",
+      "setup": "Grid size, player numbers, equipment",
+      "howItRuns": ["step 1","step 2","step 3"],
+      "watchFor": ["Watch for X → fix with Y","Watch for A → fix with B"],
+      "easier": "How to make it easier if group is struggling",
+      "harder": "How to increase difficulty",
+      "workingWhen": "What you will see when it is working well",
+      "progression": "One advancement for later in the activity"
+    }
+  ],
+  "debrief": {
+    "clock": "0:57–1:00",
+    "mins": "3 mins",
+    "question": "A single reflection question to ask the group. e.g. Name one good decision you saw tonight — not a score, a decision."
+  },
+  "croiTip": "One practical sideline insight connecting to a player attribute. One sentence."
+}
+
+Activity types must be exactly: warmup, skill, game, match
+Clock times use HH:MM format from 0:00
+Adjust number of activities to fit duration. 45 min = 3 activities. 60 min = 4. 90 min = 5.`;
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+const S = {
+  code:"", age:"", players:"", duration:"",
+  focus:"", intensity:"Medium — Standard training"
+};
+let sessionData = null;
+
+function pick(field, btn, value) {
+  btn.closest('.btn-grid').querySelectorAll('.opt').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  S[field] = value;
+  updateBuildBtn();
+}
+
+function updateBuildBtn() {
+  const ok = S.code && S.age && S.players && S.duration && S.focus;
+  const btn = document.getElementById('buildBtn');
+  const hint = document.getElementById('buildHint');
+  btn.disabled = !ok;
+  if (ok) {
+    hint.textContent = `${S.code} · ${S.age} · ${S.duration}`;
+    hint.classList.add('ready');
+  } else {
+    hint.textContent = 'Pick your options to get started';
+    hint.classList.remove('ready');
+  }
+}
+
+// ── GENERATE ─────────────────────────────────────────────────────────────────
+async function generate() {
+  const ctx = document.getElementById('ctx').value.trim();
+  showError('');
+
+  const prompt = `Build a coaching session:
+Code: ${S.code}
+Age Group: ${S.age}
+Players: ${S.players}
+Duration: ${S.duration}
+Focus: ${S.focus}
+Intensity: ${S.intensity}
+${ctx ? 'Context: ' + ctx : ''}
+
+Return only valid JSON matching the format exactly.`;
+
+  // Loading state
+  const btn = document.getElementById('buildBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Building your session…';
+
+  try {
+    const wf = WORKFLOWS.sessionBuild;
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_KEY}`,
+        'HTTP-Referer': 'https://coach.croiclub.ie',
+        'X-Title': 'Croí Coach'
+      },
+      body: JSON.stringify({
+        model: wf.profile,
+        max_tokens: wf.maxTokens,
+        temperature: wf.temperature,
+        messages: [
+          { role: 'user', content: SYSTEM_PROMPT + '\n\n' + prompt }
+        ]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const text = data.choices?.[0]?.message?.content || '';
+    sessionData = JSON.parse(text.replace(/```json|```/g, '').trim());
+    renderSession();
+
+  } catch(e) {
+    showError('Generation failed. Check your connection and try again.');
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Build Session';
+  }
+}
+
+// ── RENDER SESSION ───────────────────────────────────────────────────────────
+function renderSession() {
+  const sd = sessionData;
+
+  // Update header
+  document.getElementById('hTitle').textContent = sd.title || 'Session Plan';
+  document.getElementById('hSub').textContent = `${S.code} · ${S.age} · ${S.duration}`;
+
+  // Show clock buttons
+  document.getElementById('clockArea').style.display = 'flex';
+  document.getElementById('startBtn').hidden = false;
+
+  // Build slides
+  const track = document.getElementById('track');
+  const nav = document.getElementById('navJump');
+  const dots = document.getElementById('dots');
+  track.innerHTML = '';
+  nav.innerHTML = '';
+  dots.innerHTML = '';
+
+  const slides = [];
+
+  // ── INFO SLIDE ──
+  const infoSlide = document.createElement('div');
+  infoSlide.className = 'slide';
+  const objItems = (sd.objective || []).map(o => `<li>${o}</li>`).join('');
+  const eqItems = (sd.equipment || []).map(e => `<li>${e}</li>`).join('');
+  infoSlide.innerHTML = `
+    <div class="info-tags">
+      <span class="info-tag">${S.code}</span>
+      <span class="info-tag">${S.age}</span>
+      <span class="info-tag gold">${S.duration}</span>
+      <span class="info-tag">${S.intensity.split('—')[0].trim()}</span>
+    </div>
+    <h1 class="info-h1">${sd.title}</h1>
+    <div class="swipe-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      Swipe to see the session
+    </div>
+    ${objItems ? `<div class="info-box"><div class="info-box-title">What they'll get better at</div><ul>${objItems}</ul></div>` : ''}
+    ${eqItems ? `<div class="info-box equip"><div class="info-box-title">Equipment</div>
+      <ul>${eqItems}</ul>
+      <div class="info-meta" style="margin-top:8px">
+        ${sd.pitchArea ? `<span><strong>Pitch</strong>${sd.pitchArea}</span>` : ''}
+        ${sd.setupTime ? `<span><strong>Setup</strong>${sd.setupTime}</span>` : ''}
+      </div>
+    </div>` : ''}
+  `;
+  track.appendChild(infoSlide);
+  slides.push({ el: infoSlide, label: 'Info', id: null });
+
+  // ── ACTIVITY SLIDES ──
+  const typeLabels = { warmup:'Warm-Up', skill:'Skill Activity', game:'Conditioned Game', match:'Match Play' };
+  const navLabels = { warmup:'Warm-Up', skill:'Skill', game:'Game', match:'Match' };
+
+  (sd.activities || []).forEach((act, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    const blockId = `blk${i}`;
+
+    const runsHtml = Array.isArray(act.howItRuns)
+      ? act.howItRuns.map(r => `<li>${r}</li>`).join('')
+      : `<li>${act.howItRuns}</li>`;
+
+    const watchHtml = (act.watchFor || []).map(w => `<li>${w}</li>`).join('');
+
+    slide.innerHTML = `
+      <div class="act-block ${act.type}" id="${blockId}">
+        <div class="act-head">
+          <div class="act-timing">
+            <div class="act-clock">${act.clock || ''}</div>
+            <div class="act-mins">${act.mins || ''}</div>
+          </div>
+          <div class="act-mid">
+            <div class="act-type">${typeLabels[act.type] || act.type}</div>
+            <div class="act-name">${act.name}<span class="now-badge">NOW</span></div>
+          </div>
+          <div class="act-check" onclick="toggleDone(this)">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="act-body">
+          ${act.idea ? `<div class="act-idea">${act.idea}</div>` : ''}
+          ${act.setup ? `<div style="margin-bottom:11px"><div class="row-label">Set up</div><div class="act-setup">${act.setup}</div></div>` : ''}
+          ${runsHtml ? `<div style="margin-bottom:11px"><div class="row-label">How it runs</div><ol class="runs">${runsHtml}</ol></div>` : ''}
+          ${watchHtml ? `<div class="watch-box"><div class="row-label" style="color:#1C7A6D;margin-bottom:5px">Watch For</div><ul class="watch-list">${watchHtml}</ul></div>` : ''}
+          ${(act.easier || act.harder) ? `
+            <div class="adapt-row">
+              ${act.easier ? `<div class="adapt-card easier"><div class="adapt-lbl">Make it easier</div>${act.easier}</div>` : ''}
+              ${act.harder ? `<div class="adapt-card harder"><div class="adapt-lbl">Make it harder</div>${act.harder}</div>` : ''}
+            </div>` : ''}
+          ${act.workingWhen ? `<div class="working">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2A8C6E" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="#2A8C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><b>Working when:</b> ${act.workingWhen}</div>
+          </div>` : ''}
+          ${act.progression ? `<div class="progression"><strong>Progression:</strong> ${act.progression}</div>` : ''}
+          ${fbSection(i)}
+        </div>
+      </div>
+    `;
+    track.appendChild(slide);
+    slides.push({ el: slide, label: navLabels[act.type] || act.type, id: blockId });
+  });
+
+  // ── CROÍ TIP SLIDE ──
+  const tipSlide = document.createElement('div');
+  tipSlide.className = 'slide';
+  tipSlide.innerHTML = `
+    <div class="tip-slide">
+      <div class="tip-label">⭐ Croí Tip</div>
+      <p class="tip-text">${sd.croiTip || ''}</p>
+    </div>
+  `;
+  track.appendChild(tipSlide);
+  slides.push({ el: tipSlide, label: 'Tip', id: null });
+
+  // ── DEBRIEF SLIDE ──
+  if (sd.debrief) {
+    const debSlide = document.createElement('div');
+    debSlide.className = 'slide';
+    debSlide.innerHTML = `
+      <div class="debrief-card">
+        <div class="debrief-label">Debrief · ${sd.debrief.mins || '3 mins'}</div>
+        <div class="debrief-q">"${sd.debrief.question}"</div>
+        <div class="debrief-note">End on their voice, not yours. Reflection locks in learning faster than any drill.</div>
+      </div>
+    `;
+    track.appendChild(debSlide);
+    slides.push({ el: debSlide, label: 'Debrief', id: null });
+  }
+
+  // ── BUILD NAV + DOTS ──
+  nav.innerHTML = '';
+  dots.innerHTML = '';
+  slides.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.textContent = s.label;
+    a.dataset.i = i;
+    a.addEventListener('click', e => { e.preventDefault(); goTo(i); });
+    nav.appendChild(a);
+
+    const d = document.createElement('span');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    dots.appendChild(d);
+  });
+
+  nav.hidden = false;
+
+  // ── SHOW SESSION SCREEN ──
+  document.getElementById('formScreen').hidden = true;
+  document.getElementById('stickyBuild').hidden = true;
+  document.getElementById('sessionScreen').hidden = false;
+
+  // Init swipe
+  initSwipe(slides);
+  initClock(sd);
+  goTo(0, false);
+}
+
+// ── FEEDBACK ─────────────────────────────────────────────────────────────────
+const REASONS = ['Too complex','Too long','Didn\'t suit my group','Just not for me'];
+const fbState = {};
+
+function fbSection(i) {
+  const id = `act${i}`;
+  const chips = REASONS.map(r => `<button class="reason-chip" onclick="pickReason('${id}','${r}',this)">${r}</button>`).join('');
+  return `
+    <div class="fb-wrap">
+      <div class="fb-label">Was this useful?</div>
+      <div class="fb-row" id="fb${id}">
+        <button class="fb-btn up" onclick="fbVote('${id}',1,this)">👍 More like this</button>
+        <button class="fb-btn dn" onclick="fbVote('${id}',-1,this)">👎 Less</button>
+        <button class="fb-btn sv" onclick="fbSave('${id}',this)">♡ Save</button>
+      </div>
+      <div class="reasons" id="reasons${id}">${chips}</div>
+    </div>`;
+}
+
+function fbVote(id, v, btn) {
+  if (!fbState[id]) fbState[id] = {};
+  fbState[id].vote = fbState[id].vote === v ? 0 : v;
+  const row = document.getElementById('fb' + id);
+  row.querySelector('.up').classList.toggle('on', fbState[id].vote === 1);
+  row.querySelector('.dn').classList.toggle('on', fbState[id].vote === -1);
+  const reasons = document.getElementById('reasons' + id);
+  reasons.classList.toggle('show', fbState[id].vote === -1);
+  if (fbState[id].vote === 1) showToast('More sessions like this ✓');
+}
+
+function fbSave(id, btn) {
+  if (!fbState[id]) fbState[id] = {};
+  fbState[id].saved = !fbState[id].saved;
+  btn.classList.toggle('on', fbState[id].saved);
+  showToast(fbState[id].saved ? 'Drill saved ♥' : 'Removed from saved');
+}
+
+function pickReason(id, reason, chip) {
+  if (!fbState[id]) fbState[id] = {};
+  fbState[id].reason = fbState[id].reason === reason ? null : reason;
+  document.querySelectorAll(`#reasons${id} .reason-chip`).forEach(c => c.classList.remove('on'));
+  if (fbState[id].reason) chip.classList.add('on');
+}
+
+// ── DONE CHECK ───────────────────────────────────────────────────────────────
+function toggleDone(checkEl) {
+  checkEl.closest('.act-block').classList.toggle('done');
+  updateProgress();
+}
+
+function updateProgress() {
+  if (clockRunning) return;
+  const all = document.querySelectorAll('.act-block').length;
+  const done = document.querySelectorAll('.act-block.done').length;
+  document.getElementById('progFill').style.width = all ? Math.round(done/all*100)+'%' : '0%';
+}
+
+// ── SWIPE ────────────────────────────────────────────────────────────────────
+let slides = [], idx = 0, deckW = 0, justSwiped = false;
+
+function initSwipe(slideList) {
+  slides = slideList;
+  idx = 0;
+  const deck = document.getElementById('deck');
+  const track = document.getElementById('track');
+  deckW = deck.clientWidth;
+
+  window.addEventListener('resize', () => {
+    deckW = deck.clientWidth;
+    setX(-idx * deckW, false);
+  });
+
+  let x0=null,y0=0,dx=0,axis=null,drag=false,t0=0;
+
+  deck.addEventListener('touchstart', e => {
+    if (e.touches.length > 1) { x0=null; return; }
+    const t = e.touches[0];
+    x0=t.clientX; y0=t.clientY; dx=0; axis=null; drag=false; t0=Date.now();
+    track.style.transition='none';
+  }, {passive:true});
+
+  deck.addEventListener('touchmove', e => {
+    if (x0==null) return;
+    const t=e.touches[0], mx=t.clientX-x0, my=t.clientY-y0;
+    if (!axis && (Math.abs(mx)>8||Math.abs(my)>8)) axis=Math.abs(mx)>Math.abs(my)?'x':'y';
+    if (axis==='x') {
+      e.preventDefault(); drag=true; dx=mx;
+      let base=-idx*deckW, tx=base+dx;
+      if ((idx===0&&dx>0)||(idx===slides.length-1&&dx<0)) tx=base+dx*0.3;
+      setX(tx, false);
+    }
+  }, {passive:false});
+
+  deck.addEventListener('touchend', () => {
+    if (x0==null) return;
+    if (axis==='x') {
+      const dt=Date.now()-t0;
+      const far=Math.abs(dx)>deckW*0.3;
+      const flick=Math.abs(dx)>55&&dt<220;
+      const atEnd=(idx===0&&dx>0)||(idx===slides.length-1&&dx<0);
+      if ((far||flick)&&!atEnd) goTo(idx+(dx<0?1:-1));
+      else goTo(idx);
+      justSwiped=drag;
+      setTimeout(()=>{justSwiped=false;},350);
+    }
+    x0=null; axis=null; drag=false;
+  }, {passive:true});
+}
+
+function setX(px, anim) {
+  const track = document.getElementById('track');
+  track.style.transition = anim ? 'transform .28s cubic-bezier(.22,.61,.36,1)' : 'none';
+  track.style.transform = `translateX(${px}px)`;
+}
+
+function goTo(i, anim=true) {
+  idx = Math.max(0, Math.min(slides.length-1, i));
+  setX(-idx * deckW, anim);
+  // Update nav
+  document.querySelectorAll('.nav-jump a').forEach((a,n) => a.classList.toggle('active', n===idx));
+  // Update dots
+  document.querySelectorAll('.dot').forEach((d,n) => {
+    d.classList.toggle('on', n===idx);
+  });
+  // Repaint clock so "X left" updates for the viewed slide
+  if (clockRunning) paintClock();
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+let clockRunning=false, elapsedMs=0, startMs=0, clockInt=null, schedule=[];
+
+function initClock(sd) {
+  // Build schedule from activity clock fields
+  schedule = [];
+  (sd.activities || []).forEach((act, i) => {
+    if (!act.clock) return;
+    const parts = act.clock.split('–');
+    if (parts.length !== 2) return;
+    const start = toSec(parts[0].trim());
+    const end = toSec(parts[1].trim());
+    schedule.push({ start, end, slideIdx: i+1 }); // +1 because info is slide 0
+  });
+
+  document.getElementById('startBtn').onclick = startClock;
+  document.getElementById('pauseBtn').onclick = pauseClock;
+  document.getElementById('resetBtn').onclick = resetClock;
+
+  // Tap clock to jump to current block
+  document.getElementById('clockLive').addEventListener('click', e => {
+    if (e.target.closest('button')) return;
+    const el = elapsedMs/1000;
+    const seg = schedule.find(x => el >= x.start && el < x.end);
+    if (seg) goTo(seg.slideIdx);
+  });
+}
+
+function toSec(t) {
+  const p = t.split(':').map(Number);
+  return p[0]*3600 + p[1]*60 + (p[2]||0);
+}
+
+function fmt(s) {
+  s = Math.max(0, Math.floor(s));
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+function paintClock() {
+  const el = elapsedMs/1000;
+  document.getElementById('clockElapsed').textContent = fmt(el);
+
+  // Find what's actually running now
+  const activeSeg = schedule.find(x => el >= x.start && el < x.end);
+
+  // Update NOW block highlight
+  document.querySelectorAll('.act-block').forEach(b => b.classList.remove('now-block'));
+  if (activeSeg) {
+    const block = document.querySelector(`#blk${activeSeg.slideIdx-1}`);
+    if (block) block.classList.add('now-block');
+  }
+
+  // Show time remaining for currently VIEWED slide (not just active segment)
+  const viewedSeg = schedule.find(x => x.slideIdx === idx);
+  if (viewedSeg) {
+    const remaining = viewedSeg.end - el;
+    if (remaining > 0) {
+      document.getElementById('clockLeft').textContent = fmt(remaining) + ' left';
+    } else if (activeSeg) {
+      document.getElementById('clockLeft').textContent = fmt(activeSeg.end - el) + ' left';
+    } else {
+      document.getElementById('clockLeft').textContent = 'done';
+    }
+  } else if (activeSeg) {
+    document.getElementById('clockLeft').textContent = fmt(activeSeg.end - el) + ' left';
+  } else {
+    document.getElementById('clockLeft').textContent = '';
+  }
+
+  // Progress fill
+  const total = schedule.length ? schedule[schedule.length-1].end : 3600;
+  document.getElementById('progFill').style.width = Math.min(100, el/total*100) + '%';
+}
+
+function startClock() {
+  clockRunning = true;
+  startMs = Date.now() - elapsedMs;
+  document.getElementById('startBtn').hidden = true;
+  document.getElementById('clockLive').hidden = false;
+  document.getElementById('pauseBtn').textContent = '⏸';
+  clearInterval(clockInt);
+  clockInt = setInterval(() => { elapsedMs = Date.now()-startMs; paintClock(); }, 500);
+  paintClock();
+}
+
+function pauseClock() {
+  if (clockRunning) {
+    clockRunning = false;
+    clearInterval(clockInt);
+    document.getElementById('pauseBtn').textContent = '▶';
+  } else {
+    startClock();
+  }
+}
+
+function resetClock() {
+  clockRunning = false;
+  clearInterval(clockInt);
+  elapsedMs = 0;
+  document.getElementById('startBtn').hidden = false;
+  document.getElementById('clockLive').hidden = true;
+  document.querySelectorAll('.act-block').forEach(b => b.classList.remove('now-block'));
+  document.getElementById('progFill').style.width = '0%';
+  document.getElementById('clockLeft').textContent = '';
+  updateProgress();
+}
+
+// ── COPY / SHARE ─────────────────────────────────────────────────────────────
+function buildPlainText() {
+  const sd = sessionData;
+  if (!sd) return '';
+  let t = `${sd.title}\n${S.code} · ${S.age} · ${S.players} players · ${S.duration}\n\n`;
+  if (sd.objective?.length) {
+    t += 'SESSION OBJECTIVE\n';
+    sd.objective.forEach(o => { t += `✓ ${o}\n`; });
+    t += '\n';
+  }
+  if (sd.equipment?.length) {
+    t += 'EQUIPMENT\n';
+    sd.equipment.forEach(e => { t += `· ${e}\n`; });
+    if (sd.pitchArea) t += `Pitch: ${sd.pitchArea}\n`;
+    t += '\n';
+  }
+  const tl = { warmup:'WARM-UP', skill:'SKILL ACTIVITY', game:'CONDITIONED GAME', match:'MATCH PLAY' };
+  (sd.activities || []).forEach(act => {
+    t += `■ ${act.clock} (${act.mins}) — ${tl[act.type]||act.type.toUpperCase()}\n`;
+    t += `${act.name}\n`;
+    if (act.setup) t += `Setup: ${act.setup}\n`;
+    if (act.howItRuns) {
+      const runs = Array.isArray(act.howItRuns) ? act.howItRuns : [act.howItRuns];
+      runs.forEach((r,i) => { t += `  ${i+1}. ${r}\n`; });
+    }
+    if (act.watchFor?.length) {
+      t += 'Watch For:\n';
+      act.watchFor.forEach(w => { t += `  → ${w}\n`; });
+    }
+    if (act.easier) t += `Easier: ${act.easier}\n`;
+    if (act.harder) t += `Harder: ${act.harder}\n`;
+    if (act.workingWhen) t += `Working when: ${act.workingWhen}\n`;
+    t += '\n';
+  });
+  if (sd.debrief?.question) t += `DEBRIEF\n"${sd.debrief.question}"\n\n`;
+  if (sd.croiTip) t += `CROÍ TIP\n${sd.croiTip}\n`;
+  t += '\nGenerated by Croí Coach · croiclub.ie';
+  return t;
+}
+
+function copySession() {
+  const text = buildPlainText();
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard ✓');
+    document.getElementById('copyBtn').textContent = '✓ Copied';
+    setTimeout(() => { document.getElementById('copyBtn').textContent = '📋 Copy'; }, 2000);
+  } catch(e) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('Copied ✓'));
+  }
+}
+
+async function shareSession() {
+  const text = buildPlainText();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: `Croí Coach — ${sessionData?.title||'Session'}`, text });
+      return;
+    } catch(e) { if (e.name==='AbortError') return; }
+  }
+  copySession();
+}
+
+function newSession() {
+  sessionData = null;
+  clockRunning = false;
+  clearInterval(clockInt);
+  elapsedMs = 0;
+  document.getElementById('sessionScreen').hidden = true;
+  document.getElementById('formScreen').hidden = false;
+  document.getElementById('stickyBuild').hidden = false;
+  document.getElementById('hTitle').textContent = 'Session Builder';
+  document.getElementById('hSub').textContent = 'CROÍ COACH';
+  document.getElementById('navJump').hidden = true;
+  document.getElementById('startBtn').hidden = false;
+  document.getElementById('clockLive').hidden = true;
+  document.getElementById('progFill').style.width = '0%';
+  const btn = document.getElementById('buildBtn');
+  btn.disabled = !Object.values(S).every(Boolean);
+  btn.innerHTML = '⚡ Build Session';
+}
+
+// ── UTILS ────────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const box = document.getElementById('errBox');
+  box.textContent = msg;
+  box.style.display = msg ? 'block' : 'none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+</script>
+</body>
+</html>

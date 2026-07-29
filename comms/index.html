@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí Comms — GAA Communications Assistant</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      min-height: 100vh;
+      background: #0a0f0a;
+      font-family: 'Georgia', serif;
+      color: #e8e4d9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #1a3a1a 0%, #0d200d 50%, #0a150a 100%);
+      border-bottom: 3px solid #c8a84b;
+      padding: 28px 20px 20px;
+      position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(200,168,75,.03) 40px, rgba(200,168,75,.03) 80px);
+      pointer-events: none;
+    }
+    .header-inner { max-width: 680px; margin: 0 auto; position: relative; }
+    .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .crest {
+      width: 40px; height: 40px; background: #c8a84b; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #0a0f0a;
+    }
+    .header-eyebrow { font-size: 10px; letter-spacing: 0.2em; color: #c8a84b; text-transform: uppercase; font-family: monospace; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 700; color: #f0ead8; line-height: 1.1; }
+    .header-sub { margin: 6px 0 0 52px; font-size: 13px; color: #8a9e8a; font-style: italic; }
+
+    /* ── MAIN ── */
+    .main { max-width: 680px; margin: 0 auto; padding: 20px 16px 48px; }
+
+    /* ── MODE SWITCHER ── */
+    .mode-switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .mode-btn {
+      padding: 14px 12px; background: #111811; border: 1px solid #2a3a2a;
+      border-radius: 10px; cursor: pointer; text-align: center;
+      transition: all 0.15s ease; position: relative; overflow: hidden;
+    }
+    .mode-btn::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: #2a3a2a; transition: background 0.15s ease;
+    }
+    .mode-btn.active { background: #1a2e1a; border-color: #4a7a4a; }
+    .mode-btn.active::before { background: #c8a84b; }
+    .mode-icon { font-size: 1.25rem; margin-bottom: 4px; }
+    .mode-title { font-size: 0.875rem; font-weight: 700; color: #d4cfc4; margin-bottom: 2px; font-family: monospace; }
+    .mode-btn.active .mode-title { color: #c8a84b; }
+    .mode-sub { font-size: 0.6875rem; color: #5a7a5a; line-height: 1.3; }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: #111811; border: 1px solid #2a3a2a;
+      border-radius: 12px; padding: 22px 18px; margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-size: 14px; color: #c8a84b; letter-spacing: 0.08em;
+      text-transform: uppercase; font-family: monospace; margin-bottom: 18px;
+    }
+
+    /* ── TAP BUTTON GROUPS ── */
+    .tap-group { margin-bottom: 16px; }
+    .tap-label {
+      font-size: 10px; color: #6a8a6a; letter-spacing: 0.12em;
+      text-transform: uppercase; font-family: monospace; margin-bottom: 7px; display: block;
+    }
+    .tap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .tap-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .tap-grid.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .tap-grid.c5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+
+    .tap-btn {
+      padding: 10px 6px; background: #0d150d; border: 1.5px solid #2a3a2a;
+      border-radius: 8px; cursor: pointer; font-family: monospace;
+      font-size: 0.8125rem; font-weight: 600; color: #6a8a6a;
+      text-align: center; line-height: 1.3; transition: all 0.12s ease;
+    }
+    .tap-btn:active { transform: scale(0.97); }
+    .tap-btn.on { background: #1a3a1a; border-color: #c8a84b; color: #c8a84b; }
+
+    /* ── DROPDOWN ── */
+    .field { margin-bottom: 16px; }
+    .field-label {
+      font-size: 10px; color: #6a8a6a; letter-spacing: 0.12em;
+      text-transform: uppercase; font-family: monospace; margin-bottom: 6px; display: block;
+    }
+    .field select, .field input, .field textarea {
+      width: 100%; padding: 10px 12px; background: #0d150d;
+      border: 1px solid #2a3a2a; border-radius: 6px; color: #d4cfc4;
+      font-family: Georgia, serif; font-size: 14px; outline: none;
+      transition: border-color 0.12s ease; appearance: none;
+    }
+    .field select { cursor: pointer; }
+    .field select:focus, .field input:focus, .field textarea:focus { border-color: #c8a84b; }
+    .field textarea { resize: vertical; }
+
+    /* ── SCORE ENTRY ── */
+    .score-section { margin-bottom: 16px; }
+    .score-team {
+      background: #0d150d; border: 1px solid #2a3a2a; border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 8px;
+    }
+    .score-team-label {
+      font-size: 10px; color: #6a8a6a; letter-spacing: 0.12em;
+      text-transform: uppercase; font-family: monospace; margin-bottom: 8px; display: block;
+    }
+    .score-team input[type="text"].team-name {
+      width: 100%; padding: 8px 10px; background: #111811;
+      border: 1px solid #2a3a2a; border-radius: 6px; color: #d4cfc4;
+      font-family: Georgia, serif; font-size: 14px; outline: none;
+      margin-bottom: 8px; transition: border-color 0.12s;
+    }
+    .score-team input[type="text"].team-name:focus { border-color: #c8a84b; }
+    .score-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .score-field label {
+      font-size: 9px; color: #5a7a5a; letter-spacing: 0.1em;
+      text-transform: uppercase; font-family: monospace; display: block; margin-bottom: 4px;
+    }
+    .score-field input[type="number"] {
+      width: 100%; padding: 10px 12px; background: #111811;
+      border: 1px solid #2a3a2a; border-radius: 6px; color: #d4cfc4;
+      font-family: Georgia, serif; font-size: 18px; font-weight: 700;
+      text-align: center; outline: none; transition: border-color 0.12s;
+      -moz-appearance: textfield;
+    }
+    .score-field input[type="number"]::-webkit-outer-spin-button,
+    .score-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .score-field input[type="number"]:focus { border-color: #c8a84b; }
+    .vs-divider {
+      text-align: center; color: #c8a84b; font-weight: 700; font-size: 16px;
+      padding: 6px 0; font-family: monospace;
+    }
+
+    /* ── ERROR ── */
+    .error-box {
+      background: #2a1010; border: 1px solid #8b2020; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 14px; color: #e88080; font-size: 13px; display: none;
+    }
+
+    /* ── GENERATE BUTTON ── */
+    .generate-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #c8a84b, #a88838);
+      border: none; border-radius: 8px; cursor: pointer; color: #0a0f0a;
+      font-weight: 700; font-size: 15px; font-family: Georgia, serif;
+      letter-spacing: 0.05em; transition: all 0.2s;
+    }
+    .generate-btn:disabled { background: #2a3a2a; color: #5a7a5a; cursor: not-allowed; }
+
+    /* ── OUTPUT ── */
+    .output-card {
+      background: #111811; border: 1px solid #2a3a2a; border-radius: 12px;
+      overflow: hidden; animation: fadeIn 0.4s ease; display: none;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .tabs { display: flex; border-bottom: 1px solid #2a3a2a; overflow-x: auto; }
+    .tab-btn {
+      flex: 1; min-width: 0; padding: 13px 8px; border: none;
+      border-bottom: 2px solid transparent; background: transparent;
+      color: #5a7a5a; font-family: monospace; font-size: 11px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    }
+    .tab-btn.active { background: #1a2e1a; color: #c8a84b; border-bottom-color: #c8a84b; }
+
+    .output-body { padding: 20px; }
+    .output-text {
+      background: #0d150d; border: 1px solid #1e2e1e; border-radius: 8px;
+      padding: 18px; font-size: 14px; line-height: 1.75; color: #d4cfc4;
+      white-space: pre-wrap; min-height: 140px;
+    }
+    .output-actions { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+    .copy-btn, .share-btn {
+      padding: 9px 18px; background: #1e2e1e; border: 1px solid #3a4a3a;
+      border-radius: 6px; cursor: pointer; color: #8aaa8a;
+      font-family: monospace; font-size: 12px; transition: all 0.2s;
+    }
+    .copy-btn.copied { background: #1a3a1a; border-color: #4a8a4a; color: #6acc6a; }
+    .share-btn { background: #c8a84b; border-color: #c8a84b; color: #0a0f0a; font-weight: 700; }
+    .share-btn:hover { background: #a88838; }
+
+    /* ── SPINNER ── */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(0,0,0,.2); border-top-color: #0a0f0a;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      margin-right: 8px; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer { text-align: center; margin-top: 28px; font-size: 11px; color: #3a5a3a; font-family: monospace; }
+    .footer-accent { color: #c8a84b; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-row">
+        <div class="crest">C</div>
+        <div>
+          <div class="header-eyebrow">Croí Comms</div>
+          <h1>Comms Assistant</h1>
+        </div>
+      </div>
+      <p class="header-sub">Match reports, club news &amp; social posts — publish-ready in seconds.</p>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- MODE SWITCHER -->
+    <div class="mode-switcher">
+      <button class="mode-btn active" id="btnMatch" onclick="switchMode('match')">
+        <div class="mode-icon">🏐</div>
+        <div class="mode-title">Match Report</div>
+        <div class="mode-sub">Scores, scorers &amp; key moments</div>
+      </button>
+      <button class="mode-btn" id="btnAnnouncement" onclick="switchMode('announcement')">
+        <div class="mode-icon">📣</div>
+        <div class="mode-title">Club Announcement</div>
+        <div class="mode-sub">Events, news &amp; club updates</div>
+      </button>
+    </div>
+
+    <!-- MATCH FORM -->
+    <div class="form-card" id="matchForm">
+      <div class="form-section-title">Match Details</div>
+
+      <!-- CODE -->
+      <div class="tap-group">
+        <span class="tap-label">Code</span>
+        <div class="tap-grid" id="gCode">
+          <button class="tap-btn" onclick="tap('code',this,'Gaelic Football')">Football</button>
+          <button class="tap-btn" onclick="tap('code',this,'Hurling')">Hurling</button>
+          <button class="tap-btn" onclick="tap('code',this,'Camogie')">Camogie</button>
+          <button class="tap-btn" onclick="tap('code',this,'Ladies Football')">Ladies Football</button>
+        </div>
+      </div>
+
+      <!-- GRADE -->
+      <div class="tap-group">
+        <span class="tap-label">Grade</span>
+        <div class="tap-grid" id="gGrade">
+          <button class="tap-btn" onclick="tap('grade',this,'Senior')">Senior</button>
+          <button class="tap-btn" onclick="tap('grade',this,'U20')">U20</button>
+          <button class="tap-btn" onclick="tap('grade',this,'Minor')">Minor</button>
+          <button class="tap-btn" onclick="tap('grade',this,'Underage')">Underage</button>
+        </div>
+      </div>
+
+      <!-- TYPE -->
+      <div class="tap-group">
+        <span class="tap-label">Competition Type</span>
+        <div class="tap-grid" id="gType">
+          <button class="tap-btn" onclick="tap('compType',this,'Championship')">Championship</button>
+          <button class="tap-btn" onclick="tap('compType',this,'League')">League</button>
+          <button class="tap-btn" onclick="tap('compType',this,'Féile')">Féile</button>
+          <button class="tap-btn" onclick="tap('compType',this,'Practice')">Practice</button>
+        </div>
+      </div>
+
+      <!-- STAGE — optional -->
+      <div class="tap-group">
+        <span class="tap-label">Stage <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#3a5a3a">(optional)</span></span>
+        <div class="tap-grid" id="gStage">
+          <button class="tap-btn" onclick="toggle('stage',this,'Group Stage')">Group Stage</button>
+          <button class="tap-btn" onclick="toggle('stage',this,'Quarter-Final')">Quarter-Final</button>
+          <button class="tap-btn" onclick="toggle('stage',this,'Semi-Final')">Semi-Final</button>
+          <button class="tap-btn" onclick="toggle('stage',this,'Final')">Final</button>
+        </div>
+      </div>
+
+      <!-- ROUND — optional -->
+      <div class="tap-group">
+        <span class="tap-label">Round <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#3a5a3a">(optional)</span></span>
+        <div class="tap-grid c5" id="gRound">
+          <button class="tap-btn" onclick="toggle('round',this,'Round 1')">1</button>
+          <button class="tap-btn" onclick="toggle('round',this,'Round 2')">2</button>
+          <button class="tap-btn" onclick="toggle('round',this,'Round 3')">3</button>
+          <button class="tap-btn" onclick="toggle('round',this,'Round 4')">4</button>
+          <button class="tap-btn" onclick="toggle('round',this,'Round 5')">5</button>
+        </div>
+      </div>
+
+      <!-- COUNTY -->
+      <div class="field">
+        <label class="field-label">County</label>
+        <select id="county">
+          <option value="">Select county...</option>
+          <option>Antrim</option><option>Armagh</option><option>Carlow</option>
+          <option>Cavan</option><option>Clare</option><option>Cork</option>
+          <option>Derry</option><option>Donegal</option><option>Down</option>
+          <option>Dublin</option><option>Fermanagh</option><option>Galway</option>
+          <option>Kerry</option><option>Kildare</option><option>Kilkenny</option>
+          <option>Laois</option><option>Leitrim</option><option>Limerick</option>
+          <option>Longford</option><option>Louth</option><option>Mayo</option>
+          <option>Meath</option><option>Monaghan</option><option>Offaly</option>
+          <option>Roscommon</option><option>Sligo</option><option>Tipperary</option>
+          <option>Tyrone</option><option>Waterford</option><option>Westmeath</option>
+          <option>Wexford</option><option>Wicklow</option>
+        </select>
+      </div>
+
+      <!-- SCORES -->
+      <div class="score-section">
+        <span class="tap-label">Teams &amp; Scores</span>
+
+        <div class="score-team">
+          <span class="score-team-label">Team 1</span>
+          <input type="text" class="team-name" id="homeTeam" placeholder="e.g. St Martin's" />
+          <div class="score-inputs">
+            <div class="score-field">
+              <label>Goals</label>
+              <input type="number" id="homeGoals" min="0" max="20" placeholder="0" inputmode="numeric" />
+            </div>
+            <div class="score-field">
+              <label>Points</label>
+              <input type="number" id="homePoints" min="0" max="40" placeholder="0" inputmode="numeric" />
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label style="font-size:9px;color:#5a7a5a;letter-spacing:.1em;text-transform:uppercase;font-family:monospace;display:block;margin-bottom:4px">Scorers</label>
+            <input type="text" class="team-name" id="homeScorers" placeholder="e.g. Walsh 1-3, Murphy 0-4 (3f)" />
+          </div>
+        </div>
+
+        <div class="vs-divider">v</div>
+
+        <div class="score-team">
+          <span class="score-team-label">Team 2</span>
+          <input type="text" class="team-name" id="awayTeam" placeholder="e.g. Ferns St Aidan's" />
+          <div class="score-inputs">
+            <div class="score-field">
+              <label>Goals</label>
+              <input type="number" id="awayGoals" min="0" max="20" placeholder="0" inputmode="numeric" />
+            </div>
+            <div class="score-field">
+              <label>Points</label>
+              <input type="number" id="awayPoints" min="0" max="40" placeholder="0" inputmode="numeric" />
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label style="font-size:9px;color:#5a7a5a;letter-spacing:.1em;text-transform:uppercase;font-family:monospace;display:block;margin-bottom:4px">Scorers</label>
+            <input type="text" class="team-name" id="awayScorers" placeholder="e.g. O'Brien 0-7, Kelly 0-3" />
+          </div>
+        </div>
+      </div>
+
+      <!-- KEY MOMENTS -->
+      <div class="field">
+        <label class="field-label">Key Moments <span style="color:#3a5a3a;font-weight:400;letter-spacing:0;text-transform:none">(optional)</span></label>
+        <textarea id="keyMoments" rows="2" placeholder="e.g. Red card 52 mins, injury time winner, dominant second half..."></textarea>
+      </div>
+
+      <div class="error-box" id="matchError"></div>
+      <button class="generate-btn" id="matchBtn" onclick="generateMatch()">Generate Content →</button>
+    </div>
+
+    <!-- ANNOUNCEMENT FORM -->
+    <div class="form-card hidden" id="announcementForm">
+      <div class="form-section-title">Club Announcement</div>
+
+      <div class="field">
+        <label class="field-label">What is this about?</label>
+        <input type="text" id="announcementTopic" placeholder="e.g. Lotto draw, grounds development, upcoming fundraiser, player achievement..." />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Key Details</label>
+        <textarea id="announcementDetails" rows="5" placeholder="Tell me the key information — dates, times, venues, amounts, names, what people need to know or do..."></textarea>
+      </div>
+
+      <div class="tap-group">
+        <span class="tap-label">Tone</span>
+        <div class="tap-grid" id="gTone">
+          <button class="tap-btn on" onclick="tap('tone',this,'Warm &amp; Community-Focused')">Warm &amp; Community</button>
+          <button class="tap-btn" onclick="tap('tone',this,'Exciting &amp; Energetic')">Exciting &amp; Energetic</button>
+          <button class="tap-btn" onclick="tap('tone',this,'Formal &amp; Informational')">Formal</button>
+          <button class="tap-btn" onclick="tap('tone',this,'Grateful &amp; Celebratory')">Grateful</button>
+        </div>
+      </div>
+
+      <div class="error-box" id="announcementError"></div>
+      <button class="generate-btn" id="announcementBtn" onclick="generateAnnouncement()">Generate Content →</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-card" id="outputCard">
+      <div class="tabs" id="outputTabs"></div>
+      <div class="output-body">
+        <div class="output-text" id="outputText"></div>
+        <div class="output-actions">
+          <button class="copy-btn" id="copyBtn" onclick="copyContent()">Copy</button>
+          <button class="share-btn" onclick="shareContent()">↑ Share</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span style="color:#5a7a5a">Cro<span class="footer-accent">í</span></span> · Built for GAA clubs.
+    </footer>
+  </div>
+
+<script>
+  // ── AI PROFILES & WORKFLOW CONFIGURATION ────────────────────────────────
+  const AI_PROFILES = {
+    HIGH_REASONING: "anthropic/claude-sonnet-4-6",
+    BALANCED:       "openai/gpt-4o",
+    FAST:           "google/gemini-flash-1.5",
+    CHEAP:          "meta-llama/llama-3.1-8b-instruct"
+  };
+
+  const WORKFLOWS = {
+    matchReport:  { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 1800, temperature: 0.5 },
+    whatsapp:     { profile: AI_PROFILES.FAST,           maxTokens: 600,  temperature: 0.7 },
+    announcement: { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 1500, temperature: 0.5 }
+  };
+
+  const OPENROUTER_KEY = "YOUR_OPENROUTER_KEY_HERE";
+
+  // ── STATE ────────────────────────────────────────────────────────────────
+  const S = {
+    code: '', grade: '', compType: '', stage: '', round: '', tone: 'Warm & Community-Focused'
+  };
+
+  // Single-select tap (replaces previous selection in group)
+  function tap(field, btn, value) {
+    btn.closest('.tap-grid').querySelectorAll('.tap-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    S[field] = value;
+  }
+
+  // Toggle tap — can be selected/deselected independently (stage, round)
+  function toggle(field, btn, value) {
+    const isOn = btn.classList.contains('on');
+    btn.closest('.tap-grid').querySelectorAll('.tap-btn').forEach(b => b.classList.remove('on'));
+    if (!isOn) {
+      btn.classList.add('on');
+      S[field] = value;
+    } else {
+      S[field] = '';
+    }
+  }
+
+  // ── MODE SWITCH ──────────────────────────────────────────────────────────
+  let currentMode = 'match';
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById('outputCard').style.display = 'none';
+    document.getElementById('btnMatch').classList.toggle('active', mode === 'match');
+    document.getElementById('btnAnnouncement').classList.toggle('active', mode === 'announcement');
+    document.getElementById('matchForm').classList.toggle('hidden', mode !== 'match');
+    document.getElementById('announcementForm').classList.toggle('hidden', mode !== 'announcement');
+  }
+
+  // ── UTILS ────────────────────────────────────────────────────────────────
+  function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+  function showError(id, msg) {
+    const box = document.getElementById(id);
+    box.textContent = msg; box.style.display = msg ? 'block' : 'none';
+  }
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span> Generating…' : 'Generate Content →';
+  }
+
+  // Build match context string for prompt
+  function buildMatchContext() {
+    const homeG = v('homeGoals') || '0';
+    const homeP = v('homePoints') || '0';
+    const awayG = v('awayGoals') || '0';
+    const awayP = v('awayPoints') || '0';
+    const homeScore = `${homeG}-${homeP}`;
+    const awayScore = `${awayG}-${awayP}`;
+    const homeTotal = parseInt(homeG)*3 + parseInt(homeP);
+    const awayTotal = parseInt(awayG)*3 + parseInt(awayP);
+    const winner = homeTotal > awayTotal ? v('homeTeam') : awayTotal > homeTotal ? v('awayTeam') : null;
+
+    const context = [
+      S.code, S.grade, S.compType, S.stage, S.round
+    ].filter(Boolean).join(' · ');
+
+    return { homeScore, awayScore, winner, context };
+  }
+
+  // ── TABS ─────────────────────────────────────────────────────────────────
+  const MATCH_TABS = [
+    { key:'report',   label:'📰 Match Report' },
+    { key:'social',   label:'📱 Social Post' },
+    { key:'whatsapp', label:'💬 WhatsApp' },
+    { key:'press',    label:'📻 Press Release' }
+  ];
+  const ANNOUNCEMENT_TABS = [
+    { key:'post',       label:'📱 Social Post' },
+    { key:'whatsapp',   label:'💬 WhatsApp' },
+    { key:'newsletter', label:'📧 Newsletter' }
+  ];
+
+  let output = null, activeTab = 0;
+
+  function renderTabs(tabs) {
+    document.getElementById('outputTabs').innerHTML = tabs
+      .map((t,i) => `<button class="tab-btn ${i===0?'active':''}" onclick="selectTab(${i},this)">${t.label}</button>`)
+      .join('');
+  }
+
+  function selectTab(i, btn) {
+    activeTab = i;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tabs = currentMode === 'match' ? MATCH_TABS : ANNOUNCEMENT_TABS;
+    if (output) document.getElementById('outputText').textContent = output[tabs[i].key] || '';
+    resetCopyBtn();
+  }
+
+  function showOutput(tabs) {
+    renderTabs(tabs);
+    activeTab = 0;
+    document.getElementById('outputText').textContent = output[tabs[0].key] || '';
+    document.getElementById('outputCard').style.display = 'block';
+    resetCopyBtn();
+  }
+
+  function resetCopyBtn() {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copy'; btn.classList.remove('copied');
+  }
+
+  // ── COPY / SHARE ─────────────────────────────────────────────────────────
+  function copyContent() {
+    const text = document.getElementById('outputText')?.textContent || '';
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+      setTimeout(resetCopyBtn, 2000);
+    } catch(e) {
+      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+    }
+  }
+
+  async function shareContent() {
+    const text = document.getElementById('outputText')?.textContent || '';
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Croí Comms', text }); return; }
+      catch(e) { if (e.name === 'AbortError') return; }
+    }
+    copyContent();
+  }
+
+  // ── API CALL ─────────────────────────────────────────────────────────────
+  async function callAPI(prompt, workflowKey) {
+    const wf = WORKFLOWS[workflowKey] || WORKFLOWS.matchReport;
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_KEY}`,
+        'HTTP-Referer': 'https://comms.croiclub.ie',
+        'X-Title': 'Croí Comms'
+      },
+      body: JSON.stringify({
+        model: wf.profile,
+        max_tokens: wf.maxTokens,
+        temperature: wf.temperature,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const text = data.choices?.[0]?.message?.content || '';
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  }
+
+  // ── MATCH REPORT ─────────────────────────────────────────────────────────
+  async function generateMatch() {
+    const homeTeam = v('homeTeam');
+    const awayTeam = v('awayTeam');
+    const homeG = v('homeGoals');
+    const awayG = v('awayGoals');
+
+    if (!homeTeam || !awayTeam) {
+      showError('matchError', 'Please enter both team names.');
+      return;
+    }
+    if (!S.code) {
+      showError('matchError', 'Please select the code (Football, Hurling, etc.).');
+      return;
+    }
+    showError('matchError', '');
+    setLoading('matchBtn', true);
+    document.getElementById('outputCard').style.display = 'none';
+
+    const { homeScore, awayScore, winner, context } = buildMatchContext();
+    const county = v('county');
+    const scorers = v('homeScorers') || v('awayScorers')
+      ? `${v('homeTeam')} scorers: ${v('homeScorers') || 'not provided'}. ${v('awayTeam')} scorers: ${v('awayScorers') || 'not provided'}.`
+      : 'Not provided';
+    const keyMoments = v('keyMoments');
+
+    const prompt = `You are a GAA communications officer writing content${county ? ` for ${county} GAA` : ''}.
+
+Match details:
+- ${context ? `Competition: ${context}` : ''}
+- ${homeTeam} ${homeScore} vs ${awayTeam} ${awayScore}
+- ${winner ? `Winner: ${winner}` : 'Result: Draw'}
+- Scorers: ${scorers || 'Not provided'}
+- Key moments: ${keyMoments || 'Not provided'}
+
+Generate FOUR pieces of content. Return ONLY valid JSON, no markdown, no backticks:
+{
+  "report": "Full match report. 400-500 words. Third person. Formal GAA style for county website and local newspapers. Reference the competition context and result clearly. Include scorers if provided.",
+  "social": "Social media post. Max 280 chars. Punchy. Include score.${county ? ` Use #${county.replace(/\s/g,'')}GAA.` : ''} Emoji appropriate.",
+  "whatsapp": "WhatsApp message for the club group. Short, friendly, conversational. Include the score and result. Mention key scorers if provided. Under 80 words. No hashtags. Mobile-readable with short lines.",
+  "press": "Press release. Formal: headline, dateline, opening paragraph with who/what/when/where, body with match detail and quotes placeholder [QUOTE], closing with contact info placeholder. 300-400 words."
+}`;
+
+    try {
+      output = await callAPI(prompt, 'matchReport');
+      showOutput(MATCH_TABS);
+    } catch(e) {
+      showError('matchError', 'Generation failed. Check your connection and try again.');
+    }
+    setLoading('matchBtn', false);
+  }
+
+  // ── ANNOUNCEMENT ─────────────────────────────────────────────────────────
+  async function generateAnnouncement() {
+    const topic = v('announcementTopic');
+    const details = v('announcementDetails');
+
+    if (!topic || !details) {
+      showError('announcementError', 'Please fill in what this is about and the key details.');
+      return;
+    }
+    showError('announcementError', '');
+    setLoading('announcementBtn', true);
+    document.getElementById('outputCard').style.display = 'none';
+
+    const tone = S.tone || 'Warm & Community-Focused';
+
+    const prompt = `You are a GAA club communications officer writing content for the club's social media, WhatsApp group, and newsletter.
+
+Announcement topic: ${topic}
+Key details: ${details}
+Tone: ${tone}
+
+Generate THREE pieces of content. Return ONLY valid JSON, no markdown, no backticks:
+{
+  "post": "Social media post for Facebook/Instagram. Engaging, community-focused. Relevant emoji. 150-200 words. Tone: ${tone}.",
+  "whatsapp": "WhatsApp group message. Short, friendly, mobile-readable. Short paragraphs. Plain language. Cover only what members need to know or do. Under 100 words. Tone: ${tone}.",
+  "newsletter": "Newsletter or website article. More detailed. Well-structured with clear opening, body, and call to action if relevant. 250-350 words. Tone: ${tone}."
+}`;
+
+    try {
+      output = await callAPI(prompt, 'announcement');
+      showOutput(ANNOUNCEMENT_TABS);
+    } catch(e) {
+      showError('announcementError', 'Generation failed. Check your connection and try again.');
+    }
+    setLoading('announcementBtn', false);
+  }
+</script>
+</body>
+</html>

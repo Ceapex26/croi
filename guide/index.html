@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí Platform Guide</title>
+  <meta name="description" content="How to use Croí Coach, Croí Comms and Croí Clerk — digital tools for GAA clubs." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:     #0D1F3C;
+      --teal:     #2A8C6E;
+      --green:    #1A5C38;
+      --green-lt: #EBF2EE;
+      --green-bd: #C6DACC;
+      --gold:     #C9A84C;
+      --gold-lt:  #FDF6E3;
+      --gold-bd:  #E8D5A0;
+      --bg:       #F7F8F6;
+      --white:    #FFFFFF;
+      --border:   #E2E8E4;
+      --text:     #111827;
+      --muted:    #6B7280;
+      --faint:    #9CA3AF;
+      --mist:     #F0F4F1;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      padding: 28px 20px 24px;
+      text-align: center;
+    }
+
+    .header-wordmark {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      margin-bottom: 2px;
+    }
+
+    .header-wordmark span { color: var(--gold); }
+
+    .header-label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 8px;
+    }
+
+    .header-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.5;
+      max-width: 400px;
+      margin: 0 auto 16px;
+    }
+
+    .header-url {
+      display: inline-block;
+      background: rgba(42,140,110,.2);
+      border: 1px solid rgba(42,140,110,.35);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #7DCEAE;
+      text-decoration: none;
+    }
+
+    /* ── INTRO ── */
+    .intro {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .intro p {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── NAV PILLS ── */
+    .nav-pills {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills::-webkit-scrollbar { display: none; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--mist);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.12s ease;
+    }
+
+    .pill:hover { background: var(--green-lt); border-color: var(--green-bd); color: var(--green); }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 0 40px;
+    }
+
+    /* ── TOOL SECTION ── */
+    .tool-section {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .tool-header {
+      background: var(--navy);
+      padding: 18px 20px 14px;
+      position: relative;
+    }
+
+    .tool-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--teal);
+    }
+
+    .tool-eyebrow {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 4px;
+    }
+
+    .tool-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .tool-body { padding: 18px 20px; }
+
+    .tool-desc {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* STEPS */
+    .steps-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-content {}
+
+    .step-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .step-detail {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* TIP */
+    .tool-tip {
+      background: var(--gold-lt);
+      border-left: 3px solid var(--gold);
+      border-top: 1px solid var(--gold-bd);
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .tip-star {
+      font-size: 0.875rem;
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .tip-text {
+      font-size: 0.8125rem;
+      color: #5C4A10;
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    /* ── HANDLES SECTION ── */
+    .handles {
+      padding: 14px 20px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .handles-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 8px;
+    }
+
+    .handle-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .handle-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--green-lt);
+      border: 1px solid var(--green-bd);
+      color: var(--green);
+      border-radius: 100px;
+      padding: 3px 12px;
+    }
+
+    /* ── TIPS & INFO ── */
+    .tips-section {
+      background: var(--mist);
+      border-bottom: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    .tips-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+
+    .tip-item {
+      display: flex;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .tip-item::before {
+      content: '·';
+      color: var(--teal);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── FOUNDING SECTION ── */
+    .founding-section {
+      background: var(--white);
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .founding-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gold-lt);
+      border: 1px solid var(--gold-bd);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #7A5F1A;
+      margin-bottom: 12px;
+    }
+
+    .founding-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .founding-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .contact-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--faint);
+      width: 72px;
+      flex-shrink: 0;
+    }
+
+    .contact-value {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .footer-word {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.7);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+
+    .footer-word span { color: var(--gold); }
+
+    .footer-sub {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-label">Platform Guide</div>
+    <div class="header-wordmark">Cro<span>í</span></div>
+    <p class="header-sub">Digital tools for modern GAA clubs — coaches, secretaries and PROs.</p>
+    <a href="https://app.croiclub.ie" class="header-url">app.croiclub.ie</a>
+  </header>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <p>Croí is a suite of AI-powered tools built specifically for GAA clubs. Whether you are a coach planning your next session, a secretary buried in paperwork, or a PRO writing match reports — Croí does the heavy lifting so you can focus on the club.</p>
+  </div>
+
+  <!-- NAV PILLS -->
+  <div class="nav-pills">
+    <a href="#coach" class="pill">🏑 Croí Coach</a>
+    <a href="#comms" class="pill">📰 Croí Comms</a>
+    <a href="#clerk" class="pill">📋 Croí Clerk</a>
+    <a href="#tips"  class="pill">⚡ Tips</a>
+    <a href="#founding" class="pill">⭐ Founding</a>
+  </div>
+
+  <main>
+
+    <!-- CROÍ COACH -->
+    <section class="tool-section" id="coach">
+      <div class="tool-header">
+        <div class="tool-eyebrow">For Coaches</div>
+        <div class="tool-title">🏑 Croí Coach</div>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">
+          Generates complete, GAA-specific training sessions in seconds. Aligned to the Gaelic Games Player Pathway
+          and covering all four codes — Football, Hurling, Camogie and Ladies Football. Every session includes
+          a warm-up, skill activity, conditioned game and match play, with Watch For coaching cues on every activity.
+        </p>
+
+        <p class="steps-label">How to use it</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Select your session details</div>
+            <div class="step-detail">Choose code, age group, player numbers, duration, focus and intensity from the dropdowns.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Add context (optional)</div>
+            <div class="step-detail">Tell Croí anything specific — mixed ability group, coming off a defeat, championship this weekend.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Tap Build Session</div>
+            <div class="step-detail">A complete session is generated with coaching cues, session objective and equipment list.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Copy or Share</div>
+            <div class="step-detail">Copy to clipboard or share directly to WhatsApp, email or any app on your phone.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-tip">
+        <div class="tip-star">★</div>
+        <div class="tip-text">The Watch For section on every activity tells you exactly what to look for on the pitch and how to fix it — not what to shout, but what to see.</div>
+      </div>
+    </section>
+
+    <!-- CROÍ COMMS -->
+    <section class="tool-section" id="comms">
+      <div class="tool-header">
+        <div class="tool-eyebrow">For PROs and Club Officers</div>
+        <div class="tool-title">📰 Croí Comms</div>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">
+          Generates match reports, social media posts, press releases and club announcements — publish-ready in seconds.
+          Handles both match content and general club news.
+        </p>
+
+        <p class="steps-label">How to use it</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Choose your mode</div>
+            <div class="step-detail">Select Match Report for game results, or Club Announcement for everything else.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Enter the details</div>
+            <div class="step-detail">Match: teams, score, scorers, key moments. Announcement: topic, key details, tone.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Generate</div>
+            <div class="step-detail">Three outputs produced simultaneously — long form, social post, and WhatsApp version.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Copy or Share</div>
+            <div class="step-detail">Post the social version online, paste the WhatsApp version directly into your club group.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-tip">
+        <div class="tip-star">★</div>
+        <div class="tip-text">The WhatsApp version is deliberately short and conversational — copy and paste directly into your club group without editing.</div>
+      </div>
+
+      <div class="handles">
+        <div class="handles-label">Also handles</div>
+        <div class="handle-tags">
+          <span class="handle-tag">Club Announcements</span>
+          <span class="handle-tag">Lotto &amp; Fundraisers</span>
+          <span class="handle-tag">Ground Developments</span>
+          <span class="handle-tag">Gear Launches</span>
+          <span class="handle-tag">Upcoming Events</span>
+          <span class="handle-tag">Press Releases</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CROÍ CLERK -->
+    <section class="tool-section" id="clerk">
+      <div class="tool-header">
+        <div class="tool-eyebrow">For Secretaries and Committee Members</div>
+        <div class="tool-title">📋 Croí Clerk</div>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">
+          Handles the writing your secretary dreads. Paste rough meeting notes and get formally formatted minutes,
+          action items and a WhatsApp summary. Get grant application drafts, AGM reports and professional letters — ready in minutes.
+        </p>
+
+        <p class="steps-label">How to use it</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Select a tool</div>
+            <div class="step-detail">Choose from Meeting Minutes, Grant Application, AGM Annual Report or Club Correspondence.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Fill in the details</div>
+            <div class="step-detail">Paste rough notes or answer the questions — the more detail you give, the better the output.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Generate</div>
+            <div class="step-detail">Formal and informal versions produced simultaneously for every document type.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Copy, Share or edit</div>
+            <div class="step-detail">All outputs use [CLUB NAME] placeholders — find and replace with your club name before sending.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-tip">
+        <div class="tip-star">★</div>
+        <div class="tip-text">For meeting minutes, rough bullet points are enough — you do not need complete sentences. Croí will structure and formalise them.</div>
+      </div>
+
+      <div class="handles">
+        <div class="handles-label">Also handles</div>
+        <div class="handle-tags">
+          <span class="handle-tag">Grant Applications</span>
+          <span class="handle-tag">AGM Annual Reports</span>
+          <span class="handle-tag">Club Correspondence</span>
+          <span class="handle-tag">Chairman's Address</span>
+          <span class="handle-tag">WhatsApp Summaries</span>
+          <span class="handle-tag">Action Items</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK TIPS -->
+    <section class="tips-section" id="tips">
+      <div class="tips-title">⚡ Quick Tips</div>
+      <div class="tip-item">All tools work best on mobile — use Copy or Share to send content directly from your phone.</div>
+      <div class="tip-item">Coach sessions can be shared directly to your coaching WhatsApp group after generating.</div>
+      <div class="tip-item">For Clerk, the more detail you paste in, the better the output quality.</div>
+      <div class="tip-item">Every output uses [CLUB NAME] placeholders — find and replace with your club name before sending.</div>
+      <div class="tip-item">If an output isn't quite right, regenerate with a little more context added to the input.</div>
+      <div class="tip-item">Croí Coach generates a session objective and equipment list at the top of every session.</div>
+    </section>
+
+    <!-- FOUNDING -->
+    <section class="founding-section" id="founding">
+      <div class="founding-badge">⬡ Founding Club Programme</div>
+      <div class="founding-title">Complimentary access until 31 December 2026</div>
+      <p class="founding-desc">
+        As a founding club you have full access to all three tools — Croí Coach, Croí Comms and Croí Clerk —
+        at no charge through the end of 2026. Your feedback directly shapes what Croí becomes in 2027.
+        Tell us what works, what doesn't, and what you wish it could do.
+      </p>
+
+      <div class="contact-row">
+        <div class="contact-label">Feedback</div>
+        <a href="mailto:info@croiclub.ie" class="contact-value">info@croiclub.ie</a>
+      </div>
+      <div class="contact-row">
+        <div class="contact-label">Platform</div>
+        <a href="https://app.croiclub.ie" class="contact-value">app.croiclub.ie</a>
+      </div>
+      <div class="contact-row">
+        <div class="contact-label">Website</div>
+        <a href="https://croiclub.ie" class="contact-value">croiclub.ie</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-word">Cro<span>í</span></div>
+    <p class="footer-sub">Built for volunteer GAA clubs · Ceapex Limited</p>
+  </footer>
+
+</body>
+</html>

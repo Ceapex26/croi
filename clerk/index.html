@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí Clerk — GAA Club Secretary Assistant</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #F7F8F6; color: #111827;
+      -webkit-font-smoothing: antialiased; min-height: 100vh;
+    }
+    :root {
+      --navy: #0D1F3C; --teal: #2A8C6E; --green: #1A5C38;
+      --green-lt: #EBF2EE; --green-bd: #C6DACC;
+      --gold: #C9A84C; --gold-lt: #FDF6E3; --gold-bd: #E8D5A0;
+      --bg: #F7F8F6; --white: #FFFFFF; --surface: #FFFFFF;
+      --border: #E2E8E4; --border2: #CDD5D0;
+      --text: #111827; --muted: #6B7280; --faint: #9CA3AF;
+      --error-bg: #FEF2F2; --error-bd: #FECACA; --error-tx: #DC2626;
+      --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+      --radius: 12px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--navy), #081528);
+      padding: 20px 16px 16px; border-bottom: 3px solid var(--gold);
+    }
+    .header-inner { max-width: 680px; margin: 0 auto; }
+    .header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+    .header-crest {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--gold-lt); border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: var(--navy); flex-shrink: 0;
+    }
+    .header-title { font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+    .header-title span { color: var(--gold); }
+    .header-badge {
+      font-size: .625rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--teal);
+    }
+    .header-sub { font-size: .8125rem; color: rgba(255,255,255,.45); margin-top: 2px; font-style: italic; }
+
+    /* ── TAB NAV ── */
+    .tab-nav {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      display: flex; max-width: 680px; margin: 0 auto;
+      position: sticky; top: 0; z-index: 20;
+    }
+    .tab-nav-btn {
+      flex: 1; padding: 12px 4px 10px; border: none;
+      border-bottom: 2.5px solid transparent;
+      background: transparent; cursor: pointer; font-family: inherit;
+      font-size: .6875rem; font-weight: 600; color: var(--faint);
+      text-align: center; transition: all .15s; line-height: 1.3;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .tab-nav-btn .tab-icon { font-size: 1.1rem; }
+    .tab-nav-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+    /* ── MAIN ── */
+    .main { max-width: 680px; margin: 0 auto; padding: 16px 14px 60px; }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 16px;
+      margin-bottom: 14px; box-shadow: var(--shadow);
+    }
+    .form-card-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+    }
+
+    /* ── TAP GRIDS ── */
+    .tap-group { margin-bottom: 16px; }
+    .tap-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 7px; display: block;
+    }
+    .tap-label .opt-note { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--faint); }
+    .tap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .tap-grid.c1 { grid-template-columns: 1fr; }
+    .tap-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .tap-grid.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .tap-grid.c5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+
+    .tap-btn {
+      padding: 10px 6px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      cursor: pointer; font-family: inherit; font-size: .8125rem;
+      font-weight: 500; color: var(--muted); text-align: center;
+      line-height: 1.3; transition: all .12s ease;
+    }
+    .tap-btn:active { transform: scale(.97); }
+    .tap-btn.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
+    .tap-btn.on-green { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
+
+    /* ── FIELDS ── */
+    .field { margin-bottom: 14px; }
+    .field-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 10px 12px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: .9375rem;
+      line-height: 1.5; outline: none; transition: border-color .12s;
+      appearance: none;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--teal); box-shadow: 0 0 0 3px rgba(42,140,110,.08);
+    }
+    .field textarea { resize: vertical; }
+
+    /* ── CONTEXT BOX ── */
+    .context-toggle {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .8125rem; font-weight: 600; color: var(--muted);
+      cursor: pointer; padding: 10px 0; border-top: 1px dashed var(--border);
+      margin-top: 4px; margin-bottom: 0; background: none; border-left: none;
+      border-right: none; border-bottom: none; width: 100%; font-family: inherit;
+      text-align: left; transition: color .12s;
+    }
+    .context-toggle:hover { color: var(--teal); }
+    .context-toggle .ctx-arrow { transition: transform .2s; font-size: .75rem; }
+    .context-toggle.open .ctx-arrow { transform: rotate(180deg); }
+    .context-box {
+      display: none; padding: 12px; background: var(--green-lt);
+      border: 1px solid var(--green-bd); border-radius: 8px; margin-top: 8px;
+    }
+    .context-box.open { display: block; }
+    .context-box textarea {
+      width: 100%; padding: 9px 11px; background: var(--white);
+      border: 1px solid var(--green-bd); border-radius: 6px;
+      font-family: inherit; font-size: .875rem; line-height: 1.5;
+      color: var(--text); outline: none; resize: none; min-height: 80px;
+    }
+    .context-box textarea:focus { border-color: var(--teal); }
+    .context-privacy {
+      font-size: .6875rem; color: var(--muted); margin-top: 6px;
+      display: flex; align-items: flex-start; gap: 5px; line-height: 1.4;
+    }
+
+    /* ── NOTE BOX ── */
+    .note-box {
+      background: var(--gold-lt); border: 1px solid var(--gold-bd);
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
+      font-size: .8125rem; color: #5C4A10; line-height: 1.5;
+    }
+    .note-box strong { color: #7A5F1A; }
+
+    /* ── ERROR ── */
+    .error-box {
+      background: var(--error-bg); border: 1px solid var(--error-bd);
+      border-radius: 7px; padding: 10px 14px; margin-bottom: 12px;
+      color: var(--error-tx); font-size: .875rem; display: none;
+    }
+
+    /* ── GENERATE BTN ── */
+    .generate-btn {
+      width: 100%; padding: 14px; background: var(--navy); color: #fff;
+      border: none; border-radius: 10px; font-family: inherit;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s; margin-top: 4px;
+    }
+    .generate-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .generate-btn:not(:disabled):active { transform: scale(.99); }
+    .spinner {
+      width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── OUTPUT ── */
+    .output-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow); display: none;
+      animation: fadeUp .3s ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .output-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .output-tabs::-webkit-scrollbar { display: none; }
+    .output-tab {
+      flex: 1; min-width: 0; padding: 12px 8px; border: none;
+      border-bottom: 2.5px solid transparent; background: transparent;
+      color: var(--faint); font-family: inherit; font-size: .6875rem;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: all .15s; text-align: center;
+    }
+    .output-tab.active { color: var(--navy); border-bottom-color: var(--gold); background: var(--green-lt); }
+
+    .output-body { padding: 16px; }
+    .output-text {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; font-size: .9rem;
+      line-height: 1.75; color: var(--text); white-space: pre-wrap;
+      min-height: 120px;
+    }
+    .output-actions { margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+    .action-btn {
+      padding: 9px 16px; background: var(--bg); border: 1.5px solid var(--border2);
+      border-radius: 8px; cursor: pointer; color: var(--muted);
+      font-family: inherit; font-weight: 600; font-size: .8125rem; transition: all .15s;
+    }
+    .action-btn:hover { background: var(--green-lt); border-color: var(--green-bd); color: var(--green); }
+    .action-btn.copied { background: var(--green-lt); border-color: var(--green-bd); color: var(--green); }
+    .action-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    /* ── SCORE INPUTS ── */
+    .score-team {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 13px; margin-bottom: 8px;
+    }
+    .score-team-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 7px; display: block;
+    }
+    .team-name-input {
+      width: 100%; padding: 8px 10px; background: var(--white);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: inherit; font-size: .9375rem;
+      outline: none; margin-bottom: 7px;
+    }
+    .team-name-input:focus { border-color: var(--teal); }
+    .score-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .score-field label {
+      font-size: .6875rem; font-weight: 600; color: var(--faint);
+      letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: 3px;
+    }
+    .score-num {
+      width: 100%; padding: 10px; background: var(--white);
+      border: 1px solid var(--border); border-radius: 6px;
+      font-family: inherit; font-size: 1.125rem; font-weight: 700;
+      text-align: center; color: var(--text); outline: none;
+      -moz-appearance: textfield;
+    }
+    .score-num::-webkit-outer-spin-button,
+    .score-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .score-num:focus { border-color: var(--teal); }
+    .vs-divider { text-align: center; font-weight: 700; color: var(--gold); padding: 4px 0; }
+
+    /* ── ASK CROÍ ── */
+    .ask-upload-area {
+      border: 2px dashed var(--border2); border-radius: 10px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: all .15s; background: var(--bg); margin-bottom: 12px;
+    }
+    .ask-upload-area:hover { border-color: var(--teal); background: var(--green-lt); }
+    .ask-upload-area.has-content { border-color: var(--teal); background: var(--green-lt); border-style: solid; }
+    .ask-upload-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .ask-upload-label { font-size: .875rem; font-weight: 600; color: var(--muted); }
+    .ask-upload-sub { font-size: .75rem; color: var(--faint); margin-top: 3px; }
+    .ask-paste { width: 100%; padding: 10px 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: .875rem; line-height: 1.5; color: var(--text); outline: none; resize: none; min-height: 100px; }
+    .ask-paste:focus { border-color: var(--teal); }
+
+    footer { text-align: center; padding: 20px; font-size: .75rem; color: var(--faint); }
+    .footer-accent { color: var(--gold); }
+
+    [hidden] { display: none !important; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-row">
+      <div class="header-crest">C</div>
+      <div>
+        <div class="header-badge">Croí Clerk</div>
+        <div class="header-title">Club Secretary <span>Assistant</span></div>
+      </div>
+    </div>
+    <div class="header-sub">Meetings · Correspondence · Grants · Ask Croí</div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-nav-btn active" onclick="switchTab('meetings')">
+    <span class="tab-icon">📋</span>Meetings
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('correspondence')">
+    <span class="tab-icon">✉️</span>Correspondence
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('grants')">
+    <span class="tab-icon">💰</span>Grants
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('askcroi')">
+    <span class="tab-icon">🔍</span>Ask Croí
+  </button>
+</div>
+
+<div class="main">
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 1: MEETINGS
+       ════════════════════════════════════════════════════════ -->
+  <div id="tab-meetings">
+
+    <div class="form-card">
+      <div class="form-card-title">Meetings</div>
+
+      <!-- Meeting Type -->
+      <div class="tap-group">
+        <span class="tap-label">Meeting Type</span>
+        <div class="tap-grid">
+          <button class="tap-btn" onclick="mtgTap('type','executive',this)">Executive Committee</button>
+          <button class="tap-btn" onclick="mtgTap('type','agm',this)">AGM</button>
+          <button class="tap-btn" onclick="mtgTap('type','egm',this)">EGM</button>
+          <button class="tap-btn" onclick="mtgTap('type','subcommittee',this)">Sub-Committee</button>
+        </div>
+      </div>
+
+      <!-- Action — shown after type selected -->
+      <div id="mtg-action-section" hidden>
+        <div class="tap-group">
+          <span class="tap-label">What do you need?</span>
+          <div class="tap-grid" id="mtg-action-grid"></div>
+        </div>
+      </div>
+
+      <!-- Achieve — shown after action selected -->
+      <div id="mtg-achieve-section" hidden>
+        <div class="tap-group">
+          <span class="tap-label">What should this achieve?</span>
+          <div class="tap-grid" id="mtg-achieve-grid"></div>
+        </div>
+      </div>
+
+      <!-- Dynamic form fields -->
+      <div id="mtg-fields"></div>
+
+      <!-- Context box -->
+      <button class="context-toggle" id="mtg-ctx-toggle" onclick="toggleCtx('mtg')" hidden>
+        <span>📎</span> Add context <span style="color:var(--faint);font-weight:400;font-size:.75rem;">(paste notes, previous minutes, agenda)</span>
+        <span class="ctx-arrow" style="margin-left:auto;">▾</span>
+      </button>
+      <div class="context-box" id="mtg-ctx-box">
+        <textarea id="mtg-ctx-text" placeholder="Paste supporting material here — previous minutes, rough notes, agenda items, member list..."></textarea>
+        <div class="context-privacy">🔒 Processed in-memory for this generation only. Never stored on Croí servers.</div>
+      </div>
+
+      <div class="error-box" id="mtg-error"></div>
+      <button class="generate-btn" id="mtg-gen-btn" onclick="generateMeeting()" hidden>
+        ✦ Generate
+      </button>
+    </div>
+
+    <div class="output-card" id="mtg-output"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 2: CORRESPONDENCE
+       ════════════════════════════════════════════════════════ -->
+  <div id="tab-correspondence" hidden>
+
+    <div class="form-card">
+      <div class="form-card-title">Correspondence</div>
+
+      <!-- Recipient -->
+      <div class="tap-group">
+        <span class="tap-label">Who are you writing to?</span>
+        <div class="tap-grid">
+          <button class="tap-btn" onclick="corrTap('recipient','countyboard',this)">County Board / GAA Body</button>
+          <button class="tap-btn" onclick="corrTap('recipient','members',this)">Club Members &amp; Parents</button>
+          <button class="tap-btn" onclick="corrTap('recipient','external',this)">External / Contractors</button>
+          <button class="tap-btn" onclick="corrTap('recipient','sponsors',this)">Sponsors / Partners</button>
+        </div>
+      </div>
+
+      <!-- Format -->
+      <div class="tap-group" id="corr-format-section" hidden>
+        <span class="tap-label">Format</span>
+        <div class="tap-grid c3">
+          <button class="tap-btn" onclick="corrTap('format','letter',this)">Official Letter</button>
+          <button class="tap-btn" onclick="corrTap('format','email',this)">Email</button>
+          <button class="tap-btn" onclick="corrTap('format','whatsapp',this)">WhatsApp</button>
+        </div>
+      </div>
+
+      <!-- Achieve -->
+      <div class="tap-group" id="corr-achieve-section" hidden>
+        <span class="tap-label">What should this achieve?</span>
+        <div class="tap-grid">
+          <button class="tap-btn" onclick="corrTap('achieve','inform',this)">Inform</button>
+          <button class="tap-btn" onclick="corrTap('achieve','request',this)">Request</button>
+          <button class="tap-btn" onclick="corrTap('achieve','persuade',this)">Persuade</button>
+          <button class="tap-btn" onclick="corrTap('achieve','thank',this)">Thank</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div id="corr-content-section" hidden>
+        <div class="field">
+          <label class="field-label">What is this about?</label>
+          <textarea id="corr-content" rows="4" placeholder="Describe what you need to communicate. e.g. 'Request a fixture postponement from County Board due to pitch flooding' or paste an incoming email to generate a reply."></textarea>
+        </div>
+
+        <button class="context-toggle" id="corr-ctx-toggle" onclick="toggleCtx('corr')">
+          <span>📎</span> Add context <span style="color:var(--faint);font-weight:400;font-size:.75rem;">(optional — paste a letter you received, a previous email thread, relevant background)</span>
+          <span class="ctx-arrow" style="margin-left:auto;">▾</span>
+        </button>
+        <div class="context-box" id="corr-ctx-box">
+          <textarea id="corr-ctx-text" placeholder="Paste supporting material — an email you received, a previous letter, relevant background..."></textarea>
+          <div class="context-privacy">🔒 Processed in-memory for this generation only. Never stored on Croí servers.</div>
+        </div>
+
+        <div class="error-box" id="corr-error"></div>
+        <button class="generate-btn" onclick="generateCorrespondence()">✦ Generate</button>
+      </div>
+    </div>
+
+    <div class="output-card" id="corr-output"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 3: GRANTS
+       ════════════════════════════════════════════════════════ -->
+  <div id="tab-grants" hidden>
+    <div class="form-card">
+      <div class="form-card-title">Grants &amp; Funding</div>
+
+      <!-- Grant Type -->
+      <div class="tap-group">
+        <span class="tap-label">Grant Type</span>
+        <div class="tap-grid">
+          <button class="tap-btn" onclick="setGrantType('sports-capital',this)">🏗️ Sports Capital</button>
+          <button class="tap-btn" onclick="setGrantType('seai',this)">⚡ SEAI Energy</button>
+          <button class="tap-btn" onclick="setGrantType('local-authority',this)">🏛️ Local Authority</button>
+          <button class="tap-btn" onclick="setGrantType('provincial',this)">🏐 Provincial GAA</button>
+          <button class="tap-btn" onclick="setGrantType('other',this)" style="grid-column:span 2;">📝 Other Grant</button>
+        </div>
+      </div>
+
+      <!-- Grant fields injected here -->
+      <div id="grant-fields"></div>
+
+      <!-- Context box -->
+      <button class="context-toggle" id="grant-ctx-toggle" onclick="toggleCtx('grant')" hidden>
+        <span>📎</span> Add context <span style="color:var(--faint);font-weight:400;font-size:.75rem;">(optional — paste previous application, quotation, site details)</span>
+        <span class="ctx-arrow" style="margin-left:auto;">▾</span>
+      </button>
+      <div class="context-box" id="grant-ctx-box">
+        <textarea id="grant-ctx-text" placeholder="Paste supporting material — previous application text, contractor quotes, site survey details..."></textarea>
+        <div class="context-privacy">🔒 Processed in-memory for this generation only. Never stored on Croí servers.</div>
+      </div>
+
+      <div class="error-box" id="grant-error"></div>
+      <button class="generate-btn" id="grant-gen-btn" onclick="generateGrant()" hidden>✦ Generate Application Draft</button>
+    </div>
+
+    <div class="output-card" id="grant-output"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 4: ASK CROÍ
+       ════════════════════════════════════════════════════════ -->
+  <div id="tab-askcroi" hidden>
+    <div class="form-card">
+      <div class="form-card-title">Ask Croí</div>
+      <p style="font-size:.875rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Drop any club document here — County Board circular, Foireann export, fixture list, last year's AGM report — and ask Croí what you need.
+      </p>
+
+      <!-- Upload / Paste -->
+      <div class="ask-upload-area" id="ask-upload-area" onclick="document.getElementById('ask-file-input').click()">
+        <div class="ask-upload-icon">📎</div>
+        <div class="ask-upload-label" id="ask-upload-label">Tap to upload a file</div>
+        <div class="ask-upload-sub">PDF, Word, CSV, or text — or paste content below</div>
+      </div>
+      <input type="file" id="ask-file-input" accept=".txt,.csv,.pdf,.docx,.doc" style="display:none" onchange="handleFileUpload(this)" />
+
+      <div class="field" style="margin-bottom:12px;">
+        <label class="field-label">Or paste content directly</label>
+        <textarea class="ask-paste" id="ask-paste" placeholder="Paste document text, email content, CSV data, or any club information here..."></textarea>
+      </div>
+
+      <!-- Action -->
+      <div class="tap-group">
+        <span class="tap-label">What would you like Croí to do?</span>
+        <div class="tap-grid">
+          <button class="tap-btn" onclick="askTap('action','summarise',this)">Summarise this document</button>
+          <button class="tap-btn" onclick="askTap('action','actions',this)">Find action items</button>
+          <button class="tap-btn" onclick="askTap('action','explain',this)">Explain this circular</button>
+          <button class="tap-btn" onclick="askTap('action','reply',this)">Draft a reply</button>
+          <button class="tap-btn" onclick="askTap('action','missing',this)">Check for missing info</button>
+          <button class="tap-btn" onclick="askTap('action','question',this)">Ask a question</button>
+        </div>
+      </div>
+
+      <!-- Additional context -->
+      <div class="field">
+        <label class="field-label">Additional instructions <span class="opt-note">(optional)</span></label>
+        <textarea id="ask-extra" rows="2" placeholder="e.g. 'Focus on the financial decisions only' or 'Write the reply in a formal tone'..."></textarea>
+      </div>
+
+      <div class="error-box" id="ask-error"></div>
+      <button class="generate-btn" onclick="generateAskCroi()">🔍 Ask Croí</button>
+    </div>
+
+    <div class="output-card" id="ask-output"></div>
+  </div>
+
+  <footer>Cro<span class="footer-accent">í</span> Clerk · Built for GAA volunteer clubs · Ceapex Limited</footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ── AI PROFILES & WORKFLOW CONFIGURATION ──────────────────
+// ═══════════════════════════════════════════════════════════
+const AI_PROFILES = {
+  HIGH_REASONING: "anthropic/claude-sonnet-4-6",
+  BALANCED:       "openai/gpt-4o",
+  FAST:           "google/gemini-flash-1.5",
+  CHEAP:          "meta-llama/llama-3.1-8b-instruct"
+};
+
+const WORKFLOWS = {
+  grants:         { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 4000, temperature: 0.3 },
+  agmReport:      { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 3500, temperature: 0.3 },
+  minutes:        { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 3000, temperature: 0.2 },
+  agenda:         { profile: AI_PROFILES.FAST,           maxTokens: 800,  temperature: 0.3 },
+  letter:         { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 1500, temperature: 0.4 },
+  email:          { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 1200, temperature: 0.4 },
+  whatsapp:       { profile: AI_PROFILES.FAST,           maxTokens: 600,  temperature: 0.7 },
+  askCroi:        { profile: AI_PROFILES.HIGH_REASONING, maxTokens: 2000, temperature: 0.4 }
+};
+
+const OPENROUTER_KEY = "YOUR_OPENROUTER_KEY_HERE";
+
+// ═══════════════════════════════════════════════════════════
+// ── CORE API CALL ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+async function callOpenRouter(workflowKey, prompt) {
+  const wf = WORKFLOWS[workflowKey] || WORKFLOWS.letter;
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${OPENROUTER_KEY}`,
+      "HTTP-Referer": "https://clerk.croiclub.ie",
+      "X-Title": "Croí Clerk"
+    },
+    body: JSON.stringify({
+      model: wf.profile,
+      max_tokens: wf.maxTokens,
+      temperature: wf.temperature,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || "API error");
+  return data.choices?.[0]?.message?.content || "";
+}
+
+function parseJSON(text) {
+  return JSON.parse(text.replace(/```json|```/g, "").trim());
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── TAB NAVIGATION ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+const TABS = ["meetings","correspondence","grants","askcroi"];
+let activeTab = "meetings";
+
+function switchTab(tab) {
+  activeTab = tab;
+  TABS.forEach(t => {
+    document.getElementById(`tab-${t}`).hidden = t !== tab;
+    document.querySelectorAll(".tab-nav-btn").forEach((b,i) => {
+      b.classList.toggle("active", TABS[i] === tab);
+    });
+  });
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── CONTEXT BOX ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+function toggleCtx(prefix) {
+  const toggle = document.getElementById(`${prefix}-ctx-toggle`);
+  const box = document.getElementById(`${prefix}-ctx-box`);
+  toggle.classList.toggle("open");
+  box.classList.toggle("open");
+}
+
+function getCtx(prefix) {
+  const el = document.getElementById(`${prefix}-ctx-text`);
+  return el?.value?.trim() || "";
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── MEETINGS TAB ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+const mtg = { type:"", action:"", achieve:"" };
+const mtgFields = {};
+
+const MTG_ACTIONS = {
+  executive:    ["Generate Agenda","Process Minutes"],
+  agm:          ["Generate Agenda","Process Minutes","Annual Secretary's Report"],
+  egm:          ["Generate Agenda","Process Minutes"],
+  subcommittee: ["Generate Agenda","Process Minutes"]
+};
+
+const MTG_ACHIEVE = {
+  "Generate Agenda":              ["Formal record","Send to members","County Board submission"],
+  "Process Minutes":              ["Formal record","Committee circulation","County Board submission","Public summary"],
+  "Annual Secretary's Report":    ["AGM booklet","County Board submission","Website / social post"]
+};
+
+function mtgTap(field, val, btn) {
+  mtg[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+
+  if (field === "type") {
+    mtg.action = ""; mtg.achieve = "";
+    renderMtgActions();
+    document.getElementById("mtg-achieve-section").hidden = true;
+    document.getElementById("mtg-fields").innerHTML = "";
+    document.getElementById("mtg-ctx-toggle").hidden = true;
+    document.getElementById("mtg-gen-btn").hidden = true;
+  }
+  if (field === "action") {
+    mtg.achieve = "";
+    renderMtgAchieve();
+    document.getElementById("mtg-fields").innerHTML = "";
+    document.getElementById("mtg-ctx-toggle").hidden = true;
+    document.getElementById("mtg-gen-btn").hidden = true;
+  }
+  if (field === "achieve") renderMtgForm();
+}
+
+function renderMtgActions() {
+  const actions = MTG_ACTIONS[mtg.type] || [];
+  const grid = document.getElementById("mtg-action-grid");
+  grid.innerHTML = actions.map(a =>
+    `<button class="tap-btn" data-val="${a}" onclick="mtgTapAction(this)">${a}</button>`
+  ).join("");
+  document.getElementById("mtg-action-section").hidden = false;
+}
+
+function renderMtgAchieve() {
+  const options = MTG_ACHIEVE[mtg.action] || [];
+  const grid = document.getElementById("mtg-achieve-grid");
+  grid.innerHTML = options.map(o =>
+    `<button class="tap-btn" data-val="${o}" onclick="mtgTapAchieve(this)">${o}</button>`
+  ).join("");
+  document.getElementById("mtg-achieve-section").hidden = false;
+}
+
+function mtgTapAction(btn) {
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  mtg.action = btn.dataset.val;
+  mtg.achieve = "";
+  renderMtgAchieve();
+  document.getElementById("mtg-fields").innerHTML = "";
+  document.getElementById("mtg-ctx-toggle").hidden = true;
+  document.getElementById("mtg-gen-btn").hidden = true;
+}
+
+function mtgTapAchieve(btn) {
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  mtg.achieve = btn.dataset.val;
+  renderMtgForm();
+}
+
+function renderMtgForm() {
+  const f = document.getElementById("mtg-fields");
+  const toggle = document.getElementById("mtg-ctx-toggle");
+  const btn = document.getElementById("mtg-gen-btn");
+
+  if (mtg.action === "Generate Agenda") {
+    f.innerHTML = `
+      <div class="field"><label class="field-label">Meeting Date</label>
+        <input type="text" id="mtg-date" placeholder="e.g. Tuesday 12 August 2025, 8pm, Club House" oninput="mtgFields.date=this.value"/></div>
+      <div class="field"><label class="field-label">Key Agenda Items</label>
+        <textarea id="mtg-items" rows="4" placeholder="List the main items to be covered. e.g.&#10;- Fixtures update&#10;- Finance report&#10;- Grounds update&#10;- Any other business" oninput="mtgFields.items=this.value"></textarea></div>
+      <div class="field"><label class="field-label">Any specific motions or matters? <span class="opt-note">(optional)</span></label>
+        <input type="text" id="mtg-motions" placeholder="e.g. Motion on training schedule, officer resignation" oninput="mtgFields.motions=this.value"/></div>
+    `;
+  } else if (mtg.action === "Process Minutes") {
+    f.innerHTML = `
+      <div class="field"><label class="field-label">Meeting Date &amp; Attendees</label>
+        <input type="text" id="mtg-date" placeholder="e.g. Executive Committee, 4 June 2025. Present: 8 members." oninput="mtgFields.date=this.value"/></div>
+      <div class="field"><label class="field-label">Rough Notes / Audio Transcript</label>
+        <textarea id="mtg-notes" rows="7" placeholder="Paste your rough notes, bullet points, or audio transcript here. They don't need to be complete sentences — Croí will structure and formalise them." oninput="mtgFields.notes=this.value"></textarea></div>
+    `;
+  } else if (mtg.action === "Annual Secretary's Report") {
+    f.innerHTML = renderAGMFields();
+  }
+
+  toggle.hidden = false;
+  btn.hidden = false;
+  showError("mtg-error","");
+}
+
+function renderAGMFields() {
+  const lengths   = ["Short (600 words)","Standard (900 words)","Comprehensive (1,300 words)"];
+  const sentiments= ["🟢 Excellent Year","🟢 Good Progress","🟡 Mixed Season","🔴 Challenging Year"];
+  const codes     = ["Men's Football","Hurling","Ladies Football","Camogie"];
+  const highlights= ["County title 🏆","Promoted","Reached a final","New sponsor","Pitch / facility upgrade","Grant received","New equipment","Increased membership","New coaches","Healthy Club","Cul Camp hosted","Successful fundraiser"];
+  const community = ["Schools coaching","Darkness Into Light","Gaelic4Mothers & Others","Charity event","Inclusion programme","All-abilities initiative"];
+  const schoolOpts= ["Strong","Ongoing","Developing"];
+  const priorities= ["Increase membership","More coaches","Facility upgrades","Grant funding","Improve communications","Develop juvenile section","Grow ladies football","Grow camogie","Healthy Club status","Referee recruitment"];
+  const thanks    = ["Coaches & mentors","Parents","Sponsors","Grounds committee","Lotto committee","Executive committee","County Board","Volunteers generally"];
+
+  function tapBtns(field, opts, multi) {
+    return opts.map(o => {
+      const safe = o.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+      const fn = multi ? `agmToggleBtn(this,'${field}')` : `agmTapBtn(this,'${field}')`;
+      return `<button class="tap-btn" data-val="${safe}" onclick="${fn}">${o}</button>`;
+    }).join("");
+  }
+
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="field" style="margin:0"><label class="field-label">Report Year</label>
+        <input type="text" placeholder="e.g. 2025" oninput="agmForm.year=this.value"/></div>
+      <div class="field" style="margin:0"><label class="field-label">Secretary Name</label>
+        <input type="text" placeholder="e.g. Máire Ní Bhriain" oninput="agmForm.secretary=this.value"/></div>
+    </div>
+    <div class="tap-group"><span class="tap-label">Report Length</span>
+      <div class="tap-grid c3">${tapBtns("length", lengths, false)}</div></div>
+    <div class="tap-group"><span class="tap-label">Season Sentiment</span>
+      <div class="tap-grid">${tapBtns("sentiment", sentiments, false)}</div></div>
+    <hr class="divider"/>
+    <div class="tap-group"><span class="tap-label">Active Codes</span>
+      <div class="tap-grid">${tapBtns("codes", codes, true)}</div></div>
+    <div class="tap-group"><span class="tap-label">Season Highlights</span>
+      <div class="tap-grid">${tapBtns("highlights", highlights, true)}</div></div>
+    <div class="tap-group"><span class="tap-label">Community &amp; Inclusion</span>
+      <div class="tap-grid">${tapBtns("community", community, true)}</div></div>
+    <div class="tap-group"><span class="tap-label">School Links</span>
+      <div class="tap-grid c3">${tapBtns("schoolLinks", schoolOpts, false)}</div></div>
+    <hr class="divider"/>
+    <div class="field"><label class="field-label">Anything else to mention? <span class="opt-note">(optional)</span></label>
+      <textarea rows="2" placeholder="e.g. Senior footballers reached county semi-final. New gym opened in August." oninput="agmForm.extra=this.value"></textarea></div>
+    <div class="tap-group"><span class="tap-label">Priorities for Next Year</span>
+      <div class="tap-grid">${tapBtns("priorities", priorities, true)}</div></div>
+    <hr class="divider"/>
+    <div class="tap-group"><span class="tap-label">Acknowledge</span>
+      <div class="tap-grid">${tapBtns("thanks", thanks, true)}</div></div>
+    <div class="field"><label class="field-label">In Memoriam <span class="opt-note">(optional)</span></label>
+      <input type="text" placeholder="Names of deceased members to be remembered" oninput="agmForm.inMemoriam=this.value"/></div>
+  `;
+}
+
+function agmTapBtn(btn, field) {
+  const val = btn.dataset.val;
+  agmForm[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+}
+
+function agmToggleBtn(btn, field) {
+  const val = btn.dataset.val;
+  if (!agmForm[field]) agmForm[field] = [];
+  const idx = agmForm[field].indexOf(val);
+  if (idx >= 0) agmForm[field].splice(idx, 1);
+  else agmForm[field].push(val);
+  btn.classList.toggle("on");
+}
+
+// ── MEETING GENERATE ────────────────────────────────────────
+async function generateMeeting() {
+  const ctx = getCtx("mtg");
+  let prompt = "", workflowKey = "minutes";
+
+  if (mtg.action === "Generate Agenda") {
+    workflowKey = "agenda";
+    const typeLabel = {executive:"Executive Committee",agm:"Annual General Meeting",egm:"Extraordinary General Meeting",subcommittee:"Sub-Committee"}[mtg.type];
+    prompt = `You are a GAA club secretary generating an official meeting agenda (An Clár) for [CLUB NAME] GAA.
+
+Meeting: ${typeLabel}
+Date/Venue: ${mtgFields.date || "Not specified"}
+Main agenda items: ${mtgFields.items || "Standard agenda"}
+Specific motions/matters: ${mtgFields.motions || "None"}
+Additional context: ${ctx || "None"}
+Purpose: ${mtg.achieve}
+
+Generate a formal, properly structured GAA meeting agenda. Include: official title, date/time/venue, opening prayer reference, minutes of previous meeting, matters arising, and all agenda items numbered and formatted. End with Any Other Business and date of next meeting placeholder.
+Return ONLY valid JSON: {"agenda": "Full agenda text", "notice": "Short formal notice of meeting to send to members (2-3 sentences, formal GAA tone)"}`;
+
+  } else if (mtg.action === "Process Minutes") {
+    workflowKey = "minutes";
+    const typeLabel = {executive:"Executive Committee",agm:"Annual General Meeting",egm:"Extraordinary General Meeting",subcommittee:"Sub-Committee"}[mtg.type];
+    prompt = `You are a GAA club secretary producing formal meeting minutes for [CLUB NAME] GAA.
+
+Meeting: ${typeLabel}
+Meeting details: ${mtgFields.date || "Not specified"}
+Raw notes/transcript: ${mtgFields.notes || "Not provided"}
+Additional context: ${ctx || "None"}
+Purpose: ${mtg.achieve}
+
+Structure and formalise these notes into proper GAA meeting minutes. Include: header (club, meeting type, date, venue, present), minutes of proceedings for each agenda item, formal resolution/decision language, and action items table at the end.
+Return ONLY valid JSON: {"minutes": "Full formal minutes", "actions": "Action items list — who does what by when, formatted as plain text table", "whatsapp": "Short WhatsApp summary of key decisions for the club group (under 80 words)"}`;
+
+  } else if (mtg.action === "Annual Secretary's Report") {
+    workflowKey = "agmReport";
+    const codes      = (agmForm.codes      ||[]).join(", ")||"Not specified";
+    const highlights = (agmForm.highlights ||[]).join(", ")||"Not specified";
+    const community  = (agmForm.community  ||[]).join(", ")||"None";
+    const thanks     = (agmForm.thanks     ||[]).join(", ")||"Coaches, parents, volunteers";
+    const priorities = (agmForm.priorities ||[]).join(", ")||"Not specified";
+    const length     = agmForm.length||"Standard (900 words)";
+    const wordCount  = length.includes("600")?"550-650":length.includes("1,300")?"1,200-1,400":"850-950";
+
+    prompt = `You are Croí Clerk, writing the official Annual Secretary's Report (Tuarascáil an Rúnaí) for a GAA club's AGM.
+
+Year: ${agmForm.year||"the past year"} | Secretary: ${agmForm.secretary||"[SECRETARY NAME]"}
+Season: ${agmForm.sentiment||"Not specified"} | Codes: ${codes}
+Highlights: ${highlights} | Community: ${community}
+School Links: ${agmForm.schoolLinks||"Ongoing"} | Priorities: ${priorities}
+Extra notes: ${agmForm.extra||"None"} | Thanks: ${thanks}
+In Memoriam: ${agmForm.inMemoriam||"None"}
+Additional context: ${ctx||"None"}
+Purpose: ${mtg.achieve}
+
+STYLE: Warm, proud, community-focused Irish GAA voice. Use [CLUB NAME] and [COUNTY] as placeholders.
+NEVER use: "testament to", "underscore", "foster", "vibrant community", "journey", "navigating", "pivotal", "going forward"
+STRUCTURE: 1.Opening (A Chathaoirligh...) 2.Club Overview 3.Adult Games 4.Juvenile/Youth 5.Community 6.Looking Ahead 7.Buíochas 8.In Memoriam (only if names given) 9.Sign-off (Is mise, le meas, ${agmForm.secretary||"[Secretary]"}, Rúnaí)
+
+Return ONLY valid JSON:
+{"report": "Full Tuarascáil an Rúnaí — ${wordCount} words", "chairNotes": "Chairperson's Speaking Notes — 280-320 words, bullet format, chair's own voice not a copy of the report", "highlights": "10 bullet AGM highlights for social media/website — punchy, one sentence each"}`;
+  }
+
+  setLoading("mtg-gen-btn", true);
+  showError("mtg-error","");
+  try {
+    const text = await callOpenRouter(workflowKey, prompt);
+    const data = parseJSON(text);
+    const tabs = {
+      "Generate Agenda":           [["📋 Agenda","agenda"],["📨 Meeting Notice","notice"]],
+      "Process Minutes":           [["📝 Minutes","minutes"],["✅ Action Items","actions"],["💬 WhatsApp Summary","whatsapp"]],
+      "Annual Secretary's Report": [["📜 Secretary's Report","report"],["🎙️ Chair's Notes","chairNotes"],["📣 AGM Highlights","highlights"]]
+    }[mtg.action] || [];
+    renderOutput("mtg-output", tabs, data);
+  } catch(e) {
+    showError("mtg-error", "Generation failed. Please check your connection and try again.");
+  }
+  setLoading("mtg-gen-btn", false);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── CORRESPONDENCE TAB ────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+const corr = { recipient:"", format:"", achieve:"" };
+
+function corrTap(field, val, btn) {
+  corr[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+
+  if (field === "recipient") {
+    corr.format = ""; corr.achieve = "";
+    document.getElementById("corr-format-section").hidden = false;
+    document.getElementById("corr-achieve-section").hidden = true;
+    document.getElementById("corr-content-section").hidden = true;
+    document.getElementById("corr-achieve-section").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+    document.getElementById("corr-format-section").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+  }
+  if (field === "format") {
+    corr.achieve = "";
+    document.getElementById("corr-achieve-section").hidden = false;
+    document.getElementById("corr-content-section").hidden = true;
+  }
+  if (field === "achieve") {
+    document.getElementById("corr-content-section").hidden = false;
+  }
+}
+
+async function generateCorrespondence() {
+  const content = document.getElementById("corr-content")?.value?.trim();
+  const ctx = getCtx("corr");
+  if (!content) { showError("corr-error","Please describe what you need to communicate."); return; }
+
+  const recipientLabel = {countyboard:"County Board / GAA Body",members:"Club Members & Parents",external:"External / Contractors",sponsors:"Sponsors / Partners"}[corr.recipient];
+  const workflowKey = corr.format === "whatsapp" ? "whatsapp" : corr.format === "letter" ? "letter" : "email";
+
+  const prompt = `You are a GAA club secretary drafting ${corr.format === "letter" ? "an official letter" : corr.format === "email" ? "an email" : "a WhatsApp message"} on behalf of [CLUB NAME] GAA.
+
+Recipient: ${recipientLabel}
+Format: ${corr.format}
+Purpose: ${corr.achieve}
+What to communicate: ${content}
+Supporting context: ${ctx || "None"}
+
+Tone guide: ${
+  corr.recipient === "countyboard" ? "Formal, strict GAA terminology, respectful." :
+  corr.recipient === "members" ? "Clear, warm, accessible — volunteer community tone." :
+  corr.recipient === "external" ? "Professional, clear, legally sound." :
+  "Warm, appreciative, professional."
+}
+
+${corr.format === "whatsapp" ? "Under 80 words. Short lines. Conversational but clear. No hashtags." : corr.format === "letter" ? "Include: formal heading, date, salutation, body paragraphs, closing, signature block with [SECRETARY NAME] and [CLUB NAME]." : "Include: subject line, greeting, body, sign-off."}
+
+Return ONLY valid JSON: {"output": "The complete ${corr.format} text ready to use", "subject": "${corr.format === "email" ? "Email subject line" : "N/A"}"}`;
+
+  setLoading("corr-gen-btn-hidden", true);
+  showError("corr-error","");
+  const genBtn = document.querySelector("#tab-correspondence .generate-btn");
+  if (genBtn) { genBtn.disabled = true; genBtn.innerHTML = '<div class="spinner"></div> Generating…'; }
+
+  try {
+    const text = await callOpenRouter(workflowKey, prompt);
+    const data = parseJSON(text);
+    const tabLabel = corr.format === "letter" ? "📄 Letter" : corr.format === "email" ? "📧 Email" : "💬 WhatsApp";
+    renderOutput("corr-output", [[tabLabel,"output"]], data);
+  } catch(e) {
+    showError("corr-error","Generation failed. Please check your connection and try again.");
+  }
+  if (genBtn) { genBtn.disabled = false; genBtn.innerHTML = '✦ Generate'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── GRANTS TAB ────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+let grantType = "";
+const scForm = {};
+
+function setGrantType(type, btn) {
+  grantType = type;
+  document.querySelectorAll("#tab-grants .tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  renderGrantFields();
+  document.getElementById("grant-ctx-toggle").hidden = false;
+  document.getElementById("grant-gen-btn").hidden = false;
+  document.getElementById("grant-output").style.display = "none";
+}
+
+function gTap(field, val, btn) {
+  scForm[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+}
+function gTapBtn(btn, field) {
+  scForm[field] = btn.dataset.val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+}
+function gMulti(field, val, btn) {
+  if(!scForm[field]) scForm[field]=[];
+  const i=scForm[field].indexOf(val);
+  if(i>=0) scForm[field].splice(i,1); else scForm[field].push(val);
+  btn.classList.toggle("on");
+}
+function gMultiBtn(btn, field) {
+  const val = btn.dataset.val;
+  if(!scForm[field]) scForm[field]=[];
+  const i=scForm[field].indexOf(val);
+  if(i>=0) scForm[field].splice(i,1); else scForm[field].push(val);
+  btn.classList.toggle("on");
+}
+
+function renderGrantFields() {
+  const el = document.getElementById("grant-fields");
+  if (grantType === "sports-capital") { el.innerHTML = renderSportsCapitalFields(); }
+  else if (grantType === "seai")       { el.innerHTML = renderSEAIFields(); }
+  else if (grantType === "local-authority") { el.innerHTML = renderLocalAuthorityFields(); }
+  else if (grantType === "provincial") { el.innerHTML = renderProvincialFields(); }
+  else if (grantType === "other")      { el.innerHTML = renderOtherGrantFields(); }
+}
+
+function renderSportsCapitalFields() {
+  return `
+    <div class="note-box"><strong>Note:</strong> This tool drafts the narrative sections. Supporting documents (quotation, proof of funding, title documents) must be sourced and uploaded separately to OSCAR at sportscapitalprogramme.ie</div>
+    <div class="field"><label class="field-label">Project Title</label>
+      <input type="text" placeholder="e.g. Female Changing Facilities, Main Pitch Drainage" oninput="scForm.title=this.value"/></div>
+    <div class="tap-group"><span class="tap-label">Project Type</span>
+      <div class="tap-grid">
+        ${["Pitch Development","Floodlighting","Changing Rooms","Equipment","Gym Facilities","Drainage","Fencing","Other"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'projectType\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Amount Applying For (€)</label>
+      <input type="text" placeholder="e.g. €80,000" oninput="scForm.amount=this.value"/></div>
+    <div class="field"><label class="field-label">Club Co-Funding (€ and source)</label>
+      <input type="text" placeholder="e.g. €20,000 from club fundraising and GAA Development Fund loan" oninput="scForm.coFunding=this.value"/></div>
+    <div class="field"><label class="field-label">What is the problem right now?</label>
+      <textarea rows="3" placeholder="e.g. No dedicated female changing facilities. Current facilities built in 1978 and in very poor condition." oninput="scForm.problem=this.value"></textarea></div>
+    <div class="field"><label class="field-label">Current Members</label>
+      <input type="text" placeholder="e.g. 450 members across 14 adult and juvenile teams" oninput="scForm.members=this.value"/></div>
+    <div class="field"><label class="field-label">Expected Participation Increase</label>
+      <input type="text" placeholder="e.g. Female players to increase from 60 to 120; juvenile from 180 to 250" oninput="scForm.increase=this.value"/></div>
+    <div class="field"><label class="field-label">Community &amp; Sharing</label>
+      <textarea rows="2" placeholder="e.g. Shared with local primary school twice weekly. Legal licence in place." oninput="scForm.sharing=this.value"></textarea></div>
+    <div class="tap-group"><span class="tap-label">Land Ownership</span>
+      <div class="tap-grid">
+        ${["Own freehold","Registered lease 15+ years","Registered lease under 15 years","Other/Not owned"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'ownership\')">${t}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderSEAIFields() {
+  return `
+    <div class="note-box"><strong>Note:</strong> The SEAI Community Energy Grant is managed through registered SEAI Project Coordinators — clubs do not apply directly. Use this tool to build your case and brief a registered coordinator.</div>
+    <div class="tap-group"><span class="tap-label">Facility Being Upgraded</span>
+      <div class="tap-grid">
+        ${["Pitch Floodlights","Main Clubhouse / Hall","Gym & Dressing Rooms","Whole Grounds"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiFacility\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="tap-group"><span class="tap-label">Proposed Energy Upgrade</span>
+      <div class="tap-grid">
+        ${["LED Pitch Lighting","Solar PV Roof Panels","Heat Pump System","Building Insulation / Windows","EV Charging Stations","Other"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiMeasure\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Estimated Total Cost (€)</label>
+      <input type="text" placeholder="e.g. €35,000" oninput="scForm.seaiCost=this.value"/></div>
+    <div class="field"><label class="field-label">Current Energy Situation</label>
+      <textarea rows="3" placeholder="e.g. 1980s clubhouse heated by old oil boiler. 20kW halogen pitch lights run 4 nights/week." oninput="scForm.seaiBaseline=this.value"></textarea></div>
+    <div class="tap-group"><span class="tap-label">Expected Benefits</span>
+      <div class="tap-grid">
+        ${["Lower electricity costs","Reduced carbon emissions","Better lighting quality","Improved building comfort","Reduced maintenance costs","Positive environmental example"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gMultiBtn(this,\'seaiBenefits\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Community Use of Facility</label>
+      <textarea rows="2" placeholder="e.g. Primary school twice weekly, bingo Tuesday, Irish dancing Fridays" oninput="scForm.seaiCommunity=this.value"></textarea></div>
+    <div class="tap-group"><span class="tap-label">Project Stage</span>
+      <div class="tap-grid">
+        ${["Initial Idea","Quotes Being Obtained","Technical Assessment Complete","Working with SEAI / Energy Community Partner"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiContractor\')">${t}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderLocalAuthorityFields() {
+  return `
+    <div class="note-box"><strong>Note:</strong> Local authority grant schemes vary significantly between counties — Community Enhancement Programme, County Council Amenity Grants and others. This tool generates a reusable draft. Always check your specific council's current scheme, deadlines and requirements.</div>
+    <div class="field"><label class="field-label">Local Authority / County Council</label>
+      <input type="text" placeholder="e.g. Wexford County Council" oninput="scForm.laAuthority=this.value"/></div>
+    <div class="field"><label class="field-label">Project Name</label>
+      <input type="text" placeholder="e.g. Juvenile Training Gear & All-Abilities Upgrades" oninput="scForm.laProject=this.value"/></div>
+    <div class="tap-group"><span class="tap-label">Funding Category</span>
+      <div class="tap-grid">
+        ${["Equipment Purchase","Facility Accessibility / Disability","Minor Building Repair","Inclusion / Social Project","Energy Efficiency Improvement"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'laCategory\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Grant Amount Requested (€)</label>
+      <input type="text" placeholder="e.g. €4,500" oninput="scForm.laAmount=this.value"/></div>
+    <div class="tap-group"><span class="tap-label">Target Beneficiaries</span>
+      <div class="tap-grid">
+        ${["Juvenile / Underage Teams","Gaelic4Mothers & Others","Disability / All-Abilities","Senior Citizens","Wider Parish Community"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gMultiBtn(this,'laBeneficiaries')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Project Description &amp; Local Need</label>
+      <textarea rows="3" placeholder="What is being bought or repaired and why does the club need local council support?" oninput="scForm.laDescription=this.value"></textarea></div>
+    <div class="field"><label class="field-label">Community &amp; Inclusion Focus</label>
+      <textarea rows="3" placeholder="How does this project support marginalised groups, increase female participation, or reduce barriers to sport?" oninput="scForm.laInclusion=this.value"></textarea></div>
+    <div class="tap-group"><span class="tap-label">Quotes Status</span>
+      <div class="tap-grid c3">
+        ${["3 Quotes Obtained","Single Quote / Specialist Equipment","Self-Funded Balance Ready"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'laQuotes\')">${t}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderProvincialFields() {
+  return `
+    <div class="note-box"><strong>Note:</strong> Provincial Council grant criteria vary by province and change annually. Always verify current requirements and caps with your County Board before applying.</div>
+    <div class="tap-group"><span class="tap-label">Provincial Council</span>
+      <div class="tap-grid">
+        ${["Leinster GAA","Munster GAA","Ulster GAA","Connacht GAA"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provCouncil\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="tap-group"><span class="tap-label">Development Category</span>
+      <div class="tap-grid">
+        ${["Pitch Construction / Drainage","Hurling / Ball Wall","New Dressing Rooms / Gym","Property / Land Purchase","Safety / Fencing"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provCategory\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Total Project Cost (€)</label>
+      <input type="text" placeholder="e.g. €60,000" oninput="scForm.provTotal=this.value"/></div>
+    <div class="field"><label class="field-label">Amount Requested (€)</label>
+      <input type="text" placeholder="e.g. €20,000" oninput="scForm.provAmount=this.value"/></div>
+    <div class="tap-group"><span class="tap-label">Vesting Status</span>
+      <div class="tap-grid c3">
+        ${["Fully Vested in GAA","Vesting in Progress","Unvested"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provVesting\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="tap-group"><span class="tap-label">County Board Approval</span>
+      <div class="tap-grid">
+        ${["Recommended & Signed","Pending County Board Meeting"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provBoard\')">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Current Club Needs</label>
+      <textarea rows="3" placeholder="e.g. 16 adult and juvenile teams. Pitch used 5 nights/week. Female participation growing. Parish population increasing." oninput="scForm.provDemands=this.value"></textarea></div>
+    <div class="field"><label class="field-label">Project Description &amp; Financial Plan</label>
+      <textarea rows="3" placeholder="e.g. Full pitch drainage and resurfacing. Balance secured via Sports Capital (€30,000 awarded) and club funds (€10,000)." oninput="scForm.provPlan=this.value"></textarea></div>`;
+}
+
+function renderOtherGrantFields() {
+  return `
+    <div class="field"><label class="field-label">Grant Name</label>
+      <input type="text" placeholder="e.g. GAA Provincial Development Grant" oninput="scForm.otherName=this.value"/></div>
+    <div class="field"><label class="field-label">Amount Applying For</label>
+      <input type="text" placeholder="e.g. €15,000" oninput="scForm.otherAmount=this.value"/></div>
+    <div class="field"><label class="field-label">What is the money for?</label>
+      <textarea rows="3" placeholder="e.g. Resurfacing the car park, purchasing new jerseys and training equipment" oninput="scForm.otherProject=this.value"></textarea></div>
+    <div class="field"><label class="field-label">About Your Club</label>
+      <textarea rows="3" placeholder="e.g. Founded 1923, 400 members, 12 adult and juvenile teams, serves rural community of 3,000" oninput="scForm.otherClub=this.value"></textarea></div>
+    <div class="field"><label class="field-label">Who benefits and how?</label>
+      <textarea rows="3" placeholder="e.g. 200 juvenile players, improved safety, enables hosting of county fixtures" oninput="scForm.otherImpact=this.value"></textarea></div>`;
+}
+
+async function generateGrant() {
+  const ctx = getCtx("grant");
+  let prompt = "", workflowKey = "grants";
+
+  const GRANT_OUTPUT_JSON = `Return ONLY valid JSON, no markdown, no backticks:
+{"summary": "...", "narrative": "...", "checklist": "...", "review": "Croí Review — four sections: **Strengths** (2-3 bullets), **Potential Weaknesses** (2-3 bullets), **Information Still Needed** (2-3 bullets), **Recommended Next Steps**. End with disclaimer about reviewing against current guidelines."}`;
+
+  if (grantType === "sports-capital") {
+    prompt = `You are helping a GAA club write a Sports Capital Programme grant application for the Irish government's OSCAR system.
+Project: ${scForm.title||"Not provided"} | Type: ${scForm.projectType||"Not specified"}
+Amount: ${scForm.amount||"Not specified"} | Co-Funding: ${scForm.coFunding||"Not specified"}
+Problem: ${scForm.problem||"Not provided"} | Members: ${scForm.members||"Not specified"}
+Participation increase: ${scForm.increase||"Not specified"} | Sharing: ${scForm.sharing||"Not specified"}
+Ownership: ${scForm.ownership||"Not specified"} | Additional context: ${ctx||"None"}
+Use [CLUB NAME], [COUNTY], [CLUB ADDRESS] as placeholders. ${GRANT_OUTPUT_JSON.replace("...", "Project Summary for OSCAR — under 800 characters, structured: what you're applying for, current problem, measurable participation increase").replace("...", "Supporting narrative 400-600 words — club background, project detail, community impact, female participation, sustainability").replace("...", "Sports Capital Programme checklist with ☐ checkboxes — commonly required documents")}`;
+
+  } else if (grantType === "seai") {
+    prompt = `You are helping a GAA club build a project case for the SEAI Community Energy Grant.
+Facility: ${scForm.seaiFacility||"Not specified"} | Upgrade: ${scForm.seaiMeasure||"Not specified"}
+Cost: ${scForm.seaiCost||"Not specified"} | Current situation: ${scForm.seaiBaseline||"Not provided"}
+Expected benefits: ${(scForm.seaiBenefits||[]).join(", ")||"Not specified"}
+Community use: ${scForm.seaiCommunity||"Not provided"} | Stage: ${scForm.seaiContractor||"Not specified"}
+Additional context: ${ctx||"None"}
+Use [CLUB NAME] and [COUNTY] as placeholders. ${GRANT_OUTPUT_JSON.replace("...", "Project Justification & Carbon Narrative — under 1,200 characters").replace("...", "Committee & SEAI Rationale — 400-600 words, energy payback, community benefit, Green Club alignment").replace("...", "SEAI Technical Checklist with ☐ checkboxes — commonly required items")}`;
+
+  } else if (grantType === "local-authority") {
+    prompt = `You are helping a GAA club write a Local Authority / Community Grant application.
+Council: ${scForm.laAuthority||"Not specified"} | Project: ${scForm.laProject||"Not provided"}
+Category: ${scForm.laCategory||"Not specified"} | Amount: ${scForm.laAmount||"Not specified"}
+Beneficiaries: ${(scForm.laBeneficiaries||[]).join(", ")||"Not specified"}
+Description: ${scForm.laDescription||"Not provided"} | Inclusion focus: ${scForm.laInclusion||"Not provided"}
+Quotes status: ${scForm.laQuotes||"Not specified"} | Additional context: ${ctx||"None"}
+Use [CLUB NAME], [COUNTY], [PARISH] as placeholders. ${GRANT_OUTPUT_JSON.replace("...", "Project Summary & Community Impact Statement — under 1,000 characters, clear structured summary").replace("...", "Community & Inclusion Narrative — 300-500 words, social inclusion, mental health, female sport, parish utility").replace("...", "LCDC Submission Checklist with ☐ checkboxes — commonly required documents")}`;
+
+  } else if (grantType === "provincial") {
+    prompt = `You are helping a GAA club write a Provincial GAA Capital Grant application.
+Council: ${scForm.provCouncil||"Not specified"} | Category: ${scForm.provCategory||"Not specified"}
+Total cost: ${scForm.provTotal||"Not specified"} | Amount requested: ${scForm.provAmount||"Not specified"}
+Vesting: ${scForm.provVesting||"Not specified"} | County Board: ${scForm.provBoard||"Not specified"}
+Club needs: ${scForm.provDemands||"Not provided"} | Plan: ${scForm.provPlan||"Not provided"}
+Additional context: ${ctx||"None"}
+Use [CLUB NAME], [COUNTY], [PARISH] as placeholders. ${GRANT_OUTPUT_JSON.replace("...", "Provincial Grant Statement — under 1,000 characters, sports-focused rationale").replace("...", "GAA Development Justification — 400-500 words, Player Pathway, Go Games, adult demands").replace("...", "Provincial Compliance Checklist with ☐ checkboxes — commonly required documents")}`;
+
+  } else {
+    prompt = `You are helping a GAA club write a grant application.
+Grant: ${scForm.otherName||"Not specified"} | Amount: ${scForm.otherAmount||"Not specified"}
+Project: ${scForm.otherProject||"Not provided"} | Club: ${scForm.otherClub||"Not provided"}
+Impact: ${scForm.otherImpact||"Not provided"} | Additional context: ${ctx||"None"}
+${GRANT_OUTPUT_JSON.replace("...", "Compelling grant application 600-800 words").replace("...", "Executive summary 150-200 words").replace("...", "Submission checklist 8-12 items with ☐ checkboxes")}`;
+  }
+
+  const btn = document.getElementById("grant-gen-btn");
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Generating…';
+  showError("grant-error","");
+
+  try {
+    const text = await callOpenRouter(workflowKey, prompt);
+    const data = parseJSON(text);
+    renderOutput("grant-output", [
+      ["📝 Project Summary","summary"],
+      ["📄 Supporting Narrative","narrative"],
+      ["☑️ Submission Checklist","checklist"],
+      ["🔍 Croí Review","review"]
+    ], data);
+  } catch(e) {
+    showError("grant-error","Generation failed. Please check your connection and try again.");
+  }
+  btn.disabled = false; btn.innerHTML = '✦ Generate Application Draft';
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── ASK CROÍ TAB ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+const ask = { action:"", fileContent:"" };
+
+function askTap(field, val, btn) {
+  ask[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+}
+
+async function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById("ask-upload-label");
+  const area = document.getElementById("ask-upload-area");
+  label.textContent = `📄 ${file.name} attached`;
+  area.classList.add("has-content");
+  const reader = new FileReader();
+  reader.onload = e => { ask.fileContent = e.target.result; };
+  reader.readAsText(file);
+}
+
+async function generateAskCroi() {
+  const paste = document.getElementById("ask-paste")?.value?.trim();
+  const extra = document.getElementById("ask-extra")?.value?.trim();
+  const content = ask.fileContent || paste;
+
+  if (!content) { showError("ask-error","Please upload a file or paste content to analyse."); return; }
+  if (!ask.action) { showError("ask-error","Please select what you'd like Croí to do."); return; }
+  showError("ask-error","");
+
+  const actionPrompts = {
+    summarise: "Summarise this document clearly and concisely for a GAA club secretary. Identify the key points, decisions, or information a club volunteer needs to know.",
+    actions: "Extract all action items, tasks, and follow-up items from this document. Format as a clear list showing: what needs to be done, who is responsible (if mentioned), and any deadline or timeline.",
+    explain: "Explain this document in plain, simple language for a GAA club secretary who may not be familiar with official GAA or government terminology. Break down any complex rules or requirements.",
+    reply: "Draft a professional reply to this document on behalf of [CLUB NAME] GAA. Use appropriate formal or informal tone based on the nature of the document.",
+    missing: "Review this document and identify any missing information, gaps, or items that appear incomplete. Flag anything that a club secretary should follow up on or that requires clarification.",
+    question: `Answer the following question about this document: ${extra || "Please summarise the key points."}`
+  };
+
+  const prompt = `You are Croí Clerk, a GAA club secretary assistant. A club secretary has shared the following document:
+
+--- DOCUMENT START ---
+${content}
+--- DOCUMENT END ---
+
+Task: ${actionPrompts[ask.action]}
+${extra && ask.action !== "question" ? `Additional instructions: ${extra}` : ""}
+
+Provide a clear, practical response written for a GAA club volunteer. Use plain language.`;
+
+  const btn = document.querySelector("#tab-askcroi .generate-btn");
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Asking Croí…'; }
+
+  try {
+    const text = await callOpenRouter("askCroi", prompt);
+    const outputEl = document.getElementById("ask-output");
+    outputEl.style.display = "block";
+    outputEl.innerHTML = `
+      <div class="output-tabs"><button class="output-tab active">🔍 Croí's Response</button></div>
+      <div class="output-body">
+        <div class="output-text">${escHtml(text)}</div>
+        <div class="output-actions">
+          <button class="action-btn" onclick="copyText(this, ${JSON.stringify(text)})">📋 Copy</button>
+        </div>
+      </div>`;
+  } catch(e) {
+    showError("ask-error","Generation failed. Please check your connection and try again.");
+  }
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔍 Ask Croí'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── OUTPUT RENDERING ──────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+let activeOutputTab = {};
+
+function renderOutput(containerId, tabs, data) {
+  const el = document.getElementById(containerId);
+  activeOutputTab[containerId] = 0;
+
+  const tabsHTML = tabs.map(([label], i) =>
+    `<button class="output-tab ${i===0?'active':''}" onclick="selectOutputTab('${containerId}',${i},this)">${label}</button>`
+  ).join("");
+
+  const firstContent = data[tabs[0][1]] || "";
+
+  el.innerHTML = `
+    <div class="output-tabs">${tabsHTML}</div>
+    <div class="output-body">
+      <div class="output-text" id="${containerId}-text">${escHtml(firstContent)}</div>
+      <div class="output-actions">
+        <button class="action-btn" id="${containerId}-copy" onclick="copyOutput('${containerId}')">📋 Copy</button>
+        <button class="action-btn" onclick="shareOutput('${containerId}')">↑ Share</button>
+      </div>
+    </div>`;
+
+  el._tabs = tabs;
+  el._data = data;
+  el.style.display = "block";
+  el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function selectOutputTab(containerId, i, btn) {
+  const el = document.getElementById(containerId);
+  el.querySelectorAll(".output-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const key = el._tabs[i][1];
+  document.getElementById(`${containerId}-text`).textContent = el._data[key] || "";
+  const copyBtn = document.getElementById(`${containerId}-copy`);
+  if (copyBtn) { copyBtn.textContent = "📋 Copy"; copyBtn.classList.remove("copied"); }
+}
+
+function copyOutput(containerId) {
+  const text = document.getElementById(`${containerId}-text`)?.textContent || "";
+  copyText(document.getElementById(`${containerId}-copy`), text);
+}
+
+function copyText(btn, text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    if (btn) { btn.textContent = "✓ Copied"; btn.classList.add("copied");
+      setTimeout(()=>{ btn.textContent = "📋 Copy"; btn.classList.remove("copied"); }, 2000); }
+  } catch(e) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+  }
+}
+
+async function shareOutput(containerId) {
+  const text = document.getElementById(`${containerId}-text`)?.textContent || "";
+  if (navigator.share) {
+    try { await navigator.share({ title: "Croí Clerk", text }); return; } catch(e) {}
+  }
+  copyOutput(containerId);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ── UTILITIES ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg; el.style.display = msg ? "block" : "none";
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<div class="spinner"></div> Generating…' : '✦ Generate';
+}
+
+function escHtml(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+</script>
+</body>
+</html>
