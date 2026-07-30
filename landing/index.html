@@ -629,7 +629,7 @@
         <em>Give them better tools.</em>
       </h1>
       <p class="hero-sub">
-        Croí is a suite of AI tools built specifically for GAA clubs —
+        Croí is a suite of digital tools built specifically for GAA clubs —
         coaching sessions, match reports, and club administration,
         done in seconds not hours.
       </p>
@@ -681,19 +681,30 @@
     </div>
   </section>
 
-  <!-- DEMO -->
+  <!-- DEMO SECTION HEADER -->
+  <section style="background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 48px 0 0;">
+    <div class="section" style="text-align: center; padding-bottom: 0;">
+      <p class="section-label">See the Tools in Action</p>
+      <h2 class="section-title">Real output. Real clubs.<br/>Ready to use tonight.</h2>
+      <p class="section-sub" style="margin: 0 auto;">Each tool is designed around what GAA volunteers actually need — not generic AI dressed up in GAA colours.</p>
+    </div>
+  </section>
+
+  <!-- DEMO 1 — COACH -->
   <section class="demo-section">
     <div class="section">
       <div class="demo-inner">
 
         <div class="demo-copy">
-          <p class="section-label">Croí Coach in Action</p>
-          <h2 class="section-title">A complete session.<br/>In one prompt.</h2>
-          <p class="section-sub" style="margin-bottom: 24px;">A volunteer coach types a single sentence. Croí generates a complete, GAA-specific training session — structured, practical, and ready to run.</p>
+          <p class="section-label">Croí Coach</p>
+          <h2 class="section-title">A complete session.<br/>Six selections.</h2>
+          <p class="section-sub" style="margin-bottom: 20px;">A coach selects their code, age group, player numbers, session length, focus and intensity. Croí builds a complete, GAA-specific training session instantly — structured, practical, and ready to run.</p>
 
-          <div class="demo-prompt">
-            <strong>Coach typed:</strong><br/>
-            "U14 hurling, 16 players, 60 minutes, first touch and distribution under pressure. Mixed ability group."
+          <div class="demo-prompt" style="margin-bottom: 12px;">
+            <strong>Coach selected:</strong><br/>
+            Code: Hurling &nbsp;·&nbsp; Age: U15–U17 &nbsp;·&nbsp; Players: 17–24<br/>
+            Duration: 60 mins &nbsp;·&nbsp; Focus: First Touch &amp; Distribution<br/>
+            Context: <em>Mixed ability, some lack confidence with weak side</em>
           </div>
 
           <p style="font-size: 0.875rem; color: var(--faint); font-style: italic;">↓ Croí generated this in seconds</p>
@@ -704,41 +715,162 @@
             <div class="session-dot"></div>
             <div class="session-dot"></div>
             <div class="session-dot"></div>
-            <div class="session-title-bar">Croí Coach · U14 Hurling · 60 mins</div>
+            <div class="session-title-bar">Croí Coach · U15–U17 Hurling · 60 mins</div>
           </div>
           <div class="session-body">
 
-            <div class="session-meta">
-              <div class="session-meta-item"><strong>Age Group</strong>U14</div>
-              <div class="session-meta-item"><strong>Code</strong>Hurling</div>
-              <div class="session-meta-item"><strong>Players</strong>16</div>
-              <div class="session-meta-item"><strong>Duration</strong>60 mins</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #E2E8E4;">
+              <div style="padding:12px 16px;border-right:1px solid #E2E8E4;">
+                <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2A8C6E;margin-bottom:8px;">Session Objective</div>
+                <div style="font-size:0.75rem;color:#374151;line-height:1.5;margin-bottom:4px;">✓ Receive under pressure and move quickly</div>
+                <div style="font-size:0.75rem;color:#374151;line-height:1.5;margin-bottom:4px;">✓ Build confidence on the weak side</div>
+                <div style="font-size:0.75rem;color:#374151;line-height:1.5;">✓ Distribute accurately at game speed</div>
+              </div>
+              <div style="padding:12px 16px;">
+                <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0D1F3C;margin-bottom:8px;">Equipment</div>
+                <div style="font-size:0.75rem;color:#6B7280;line-height:1.5;margin-bottom:2px;">· 20 sliotars · 30 cones · Bibs</div>
+                <div style="font-size:0.75rem;color:#6B7280;margin-top:6px;"><strong style="color:#0D1F3C;">Pitch:</strong> Half pitch</div>
+                <div style="font-size:0.75rem;color:#6B7280;"><strong style="color:#0D1F3C;">Setup:</strong> 5 minutes</div>
+              </div>
             </div>
 
             <div class="session-block">
               <div class="session-block-title">Warm-Up · 10 mins</div>
-              <div class="session-block-name">Ball Tag</div>
-              <div class="session-block-detail">30x30m grid, all players, one sliotar each. Players protect their own ball while flicking others out. If your ball leaves the grid, 3 solos and rejoin.</div>
-              <div class="session-watch"><strong>Watch For →</strong> Players looking down at ball while moving — tell them to find a teammate's bib before they touch it.</div>
+              <div class="session-block-name">Sliotar Tag — Protect and Flick</div>
+              <div class="session-block-detail">30x30m grid. Every player balances their sliotar on their hurley. Flick others' sliotars off without losing your own. If yours drops, pick it up and rejoin.</div>
+              <div class="session-watch"><strong>Watch For →</strong> Players looking only at their own ball — call "heads up, scan the grid" to get eyes moving.</div>
             </div>
 
             <div class="session-block">
-              <div class="session-block-title">Skill Activity · 20 mins</div>
-              <div class="session-block-name">4v2 Keep Ball</div>
-              <div class="session-block-detail">15x15m grids, groups of 6. 4 attackers keep possession from 2 defenders. When defenders win it, last 2 to touch swap in.</div>
-              <div class="session-watch"><strong>Watch For →</strong> Players standing still after passing — they must move immediately to a new angle.</div>
+              <div class="session-block-title">Skill Activity · 18 mins</div>
+              <div class="session-block-name">First Touch Boxes</div>
+              <div class="session-block-detail">Four 10x10m boxes, 2 players inside each, 2 feeders outside. Feeder strikes in, inside player takes first touch on hurley, moves laterally, delivers to second feeder. Rotate every 90 seconds.</div>
+              <div class="session-watch"><strong>Watch For →</strong> Players catching instead of taking on the hurley — remind them the hurley receives it first.</div>
             </div>
 
             <div class="session-block">
-              <div class="session-block-title">Match Play · 20 mins</div>
-              <div class="session-block-name">8v8 Conditioned Game</div>
-              <div class="session-block-detail">Half pitch. Score only counts if preceded by a first-touch distribution from inside own half. Keeps the session focus alive in the game.</div>
+              <div class="session-block-title">Match Play · 15 mins</div>
+              <div class="session-block-name">Conditioned Match — First Touch Reward</div>
+              <div class="session-block-detail">Full match. A score from a controlled first touch and immediate distribution earns double points. Coach stays off the pitch. Let them problem-solve.</div>
             </div>
 
             <div class="session-tip">
-              <strong>Croí Tip:</strong> If a player tries a first touch pass and it breaks down, don't correct the outcome — praise the decision. That habit in training becomes instinct in a match.
+              <strong>Croí Tip:</strong> When a touch breaks down, stay calm and specific — "good movement, let's clean up that touch" lands differently than silence. Players who feel safe making mistakes will attempt more. That's Resilience.
             </div>
 
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO 2 — COMMS -->
+  <section style="background: var(--white); border-top: 1px solid var(--border); padding: 72px 0;">
+    <div class="section">
+      <div class="demo-inner">
+
+        <div class="session-card" style="order: 2;">
+          <div class="session-header" style="background: #0d200d;">
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+            <div class="session-title-bar">Croí Comms · Match Report · Social Post · Press Release</div>
+          </div>
+          <div class="session-body">
+            <div style="padding: 14px 16px; border-bottom: 1px solid #E2E8E4;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2A7A2A;margin-bottom:8px;">Match Report (excerpt)</div>
+              <div style="font-size:0.8125rem;color:#374151;line-height:1.65;">In a pulsating Senior Hurling Championship Semi-Final, Blackrock overcame a resilient Midleton side on a scoreline of 2-18 to 1-14. Two first-half goals from Ciarán Lyons proved the decisive factor as Blackrock advance to their fourth county final in five years...</div>
+            </div>
+            <div style="padding: 14px 16px; border-bottom: 1px solid #E2E8E4;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2A7A2A;margin-bottom:8px;">Social Post</div>
+              <div style="font-size:0.8125rem;color:#374151;line-height:1.65;">⚡ COUNTY SEMI-FINAL | Blackrock 2-18 Midleton 1-14<br/>A brilliant display sends the Rockies to another county final! Lyons with 2 goals, O'Brien with 0-7 from play. 💚 #CorkGAA #SHC2026</div>
+            </div>
+            <div style="padding: 14px 16px;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2A7A2A;margin-bottom:8px;">Also generated</div>
+              <div style="font-size:0.8125rem;color:#6B7280;">📻 Press Release &nbsp;·&nbsp; 💬 WhatsApp version &nbsp;·&nbsp; Copy &amp; Share ready</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-copy" style="order: 1;">
+          <p class="section-label">Croí Comms</p>
+          <h2 class="section-title">Match reports done.<br/>Before you leave the pitch.</h2>
+          <p class="section-sub" style="margin-bottom: 20px;">Enter the teams, score, scorers and key moments. Croí writes a match report, social media post and press release simultaneously — three outputs from one input.</p>
+
+          <div class="demo-prompt" style="margin-bottom: 12px;">
+            <strong>PRO entered:</strong><br/>
+            Blackrock 2-18 · Midleton 1-14<br/>
+            Senior Hurling Championship Semi-Final<br/>
+            Scorers: Lyons 2-0, O'Brien 0-7<br/>
+            <em>Key moment: Two early goals changed the game</em>
+          </div>
+
+          <p style="font-size: 0.875rem; color: var(--faint); font-style: italic;">↓ Three publish-ready outputs in seconds</p>
+
+          <div style="margin-top: 20px;">
+            <div style="font-size: 0.8125rem; color: var(--muted); margin-bottom: 8px; font-weight: 600;">Also handles:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Club Announcements</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Lotto &amp; Fundraisers</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Ground Developments</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">WhatsApp Announcements</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO 3 — CLERK -->
+  <section class="demo-section" style="background: var(--mist);">
+    <div class="section">
+      <div class="demo-inner">
+
+        <div class="demo-copy">
+          <p class="section-label">Croí Clerk</p>
+          <h2 class="section-title">The secretary's<br/>secret weapon.</h2>
+          <p class="section-sub" style="margin-bottom: 20px;">Paste rough meeting notes. Get formally formatted minutes, a clean action items list, and a WhatsApp summary — in under 30 seconds.</p>
+
+          <div class="demo-prompt" style="margin-bottom: 12px;">
+            <strong>Secretary pasted:</strong><br/>
+            <em>"Committee meeting. Discussed lotto syndicate fundraiser — 300 places at €25/month. New jerseys donated by Bolger family for U18s. Dressing room plans deferred to next meeting."</em>
+          </div>
+
+          <p style="font-size: 0.875rem; color: var(--faint); font-style: italic;">↓ Three outputs generated instantly</p>
+
+          <div style="margin-top: 20px;">
+            <div style="font-size: 0.8125rem; color: var(--muted); margin-bottom: 8px; font-weight: 600;">Also handles:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Grant Applications</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">AGM Annual Reports</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Club Correspondence</span>
+              <span style="font-size:0.75rem;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:100px;padding:3px 12px;color:var(--green);font-weight:600;">Chairman's Address</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="session-card">
+          <div class="session-header">
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+            <div class="session-title-bar">Croí Clerk · Meeting Minutes · Action Items · WhatsApp</div>
+          </div>
+          <div class="session-body">
+            <div style="padding: 14px 16px; border-bottom: 1px solid #E2E8E4;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1A5C38;margin-bottom:8px;">Formal Minutes (excerpt)</div>
+              <div style="font-size:0.8125rem;color:#374151;line-height:1.65;"><strong>[CLUB NAME] GAA — Committee Meeting</strong><br/>Date: 9th July 2026<br/><br/>1. CLUB FUNDRAISER — LOTTO SYNDICATE<br/>The committee discussed the establishment of a club lotto syndicate. 300 member places at €25/month. The committee expressed unanimous support in principle...</div>
+            </div>
+            <div style="padding: 14px 16px; border-bottom: 1px solid #E2E8E4;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1A5C38;margin-bottom:8px;">Action Items</div>
+              <div style="font-size:0.8125rem;color:#374151;line-height:1.65;font-family:monospace;">LOTTO SETUP | Secretary | Next meeting<br/>JERSEY ACKNOWLEDGEMENT | PRO | This week<br/>DRESSING ROOM PLANS | Chairman | Next meeting</div>
+            </div>
+            <div style="padding: 14px 16px;">
+              <div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1A5C38;margin-bottom:8px;">WhatsApp Summary</div>
+              <div style="font-size:0.8125rem;color:#374151;line-height:1.65;">📋 Committee meeting recap:<br/>✅ Lotto syndicate approved in principle — details to follow<br/>🎽 Thanks to the Bolger family for U18 jerseys<br/>🏗️ Dressing room plans deferred to next meeting</div>
+            </div>
           </div>
         </div>
 
@@ -858,24 +990,38 @@
     btn.disabled = true;
     btn.textContent = "Submitting…";
 
-    // Replace this URL with your Tally or Formspree endpoint
-    // e.g. https://formspree.io/f/YOUR_FORM_ID
-    // or   https://tally.so/r/YOUR_FORM_ID
-    const FORM_ENDPOINT = "YOUR_FORM_ENDPOINT_HERE";
-
     try {
-      await fetch(FORM_ENDPOINT, {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clubName, county, contactName, role, email })
+        body: JSON.stringify({
+          access_key: "f8b2654a-80ef-4428-9989-c2f78cd58d20",
+          subject: `Croí Founding Club Application — ${clubName}`,
+          from_name: "Croí Club Portal",
+          clubName,
+          county,
+          contactName,
+          role,
+          email
+        })
       });
-    } catch (e) {
-      // Even if the endpoint isn't set up yet, show success
-      // so you can test the flow
-    }
 
-    document.getElementById("applyForm").querySelectorAll(".form-field, .form-submit, .form-sub, .form-title, .form-privacy").forEach(el => el.style.display = "none");
-    document.getElementById("successMsg").style.display = "block";
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById("applyForm")
+          .querySelectorAll(".form-field, .form-submit, .form-sub, .form-title, .form-privacy")
+          .forEach(el => el.style.display = "none");
+        document.getElementById("successMsg").style.display = "block";
+      } else {
+        throw new Error("Submission failed");
+      }
+
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = "Apply for Founding Access →";
+      alert("Something went wrong. Please try again or email us directly at info@croiclub.ie");
+    }
   }
 </script>
 
