@@ -413,9 +413,79 @@ header{
 .toast.show{opacity:1}
 
 [hidden]{display:none!important}
+
+/* ── CROÍ AUTH GATE ── */
+.croi-auth-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,var(--navy),var(--navy2));}
+.croi-auth-card{width:100%;max-width:360px;background:var(--white);border-radius:14px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center;}
+.croi-auth-crest{width:46px;height:46px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;margin:0 auto 14px;box-shadow:0 0 0 3px var(--gold-lt);}
+.croi-auth-title{font-weight:800;font-size:1.1rem;color:var(--navy);margin-bottom:4px;}
+.croi-auth-sub{font-size:.8125rem;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.croi-auth-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.9375rem;font-family:inherit;outline:none;margin-bottom:10px;}
+.croi-auth-input:focus{border-color:var(--teal);}
+.croi-auth-btn{width:100%;padding:12px;background:var(--navy);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:.9375rem;cursor:pointer;font-family:inherit;}
+.croi-auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+.croi-auth-msg{font-size:.8125rem;margin-top:10px;line-height:1.5;min-height:1px;}
+.croi-auth-msg.error{color:var(--error);}
+.croi-auth-msg.ok{color:var(--green);}
+.croi-auth-loading{display:flex;align-items:center;justify-content:center;padding:24px 0;}
+.croi-auth-spin{width:22px;height:22px;border:3px solid rgba(13,31,60,.15);border-top-color:var(--navy);border-radius:50%;animation:croiSpin .7s linear infinite;}
+@keyframes croiSpin{to{transform:rotate(360deg);}}
+.croi-auth-signout{margin-top:16px;background:none;border:0;color:var(--muted);font-size:.8125rem;text-decoration:underline;cursor:pointer;font-family:inherit;}
+
+/* account controls in header */
+.croi-account{display:flex;align-items:center;gap:5px;margin-top:4px;}
+.croi-acc-btn{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:6px;padding:4px 8px;font-size:.625rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.croi-acc-btn:active{transform:scale(.96);}
+
+/* saved modal */
+.croi-modal{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;}
+.croi-modal-inner{background:var(--white);width:100%;max-width:480px;max-height:80vh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;}
+.croi-modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);flex:0 0 auto;}
+.croi-modal-header h2{font-size:1rem;font-weight:800;color:var(--navy);}
+.croi-modal-close{background:none;border:0;font-size:1.1rem;cursor:pointer;color:var(--muted);}
+.croi-saved-list{overflow-y:auto;padding:8px 12px 16px;}
+.croi-saved-empty{padding:20px;text-align:center;color:var(--muted);font-size:.875rem;}
+.croi-saved-item{border-bottom:1px solid var(--border);}
+.croi-saved-row{width:100%;text-align:left;background:none;border:0;padding:12px 4px;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:inherit;}
+.croi-saved-title{font-weight:700;font-size:.875rem;color:var(--navy);}
+.croi-saved-meta{font-size:.6875rem;color:var(--faint);text-transform:capitalize;}
+.croi-saved-body{padding:0 4px 14px;}
+.croi-saved-payload{white-space:pre-wrap;font-size:.75rem;line-height:1.5;background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:10px;max-height:240px;overflow-y:auto;}
+.croi-saved-copy{margin-top:8px;padding:7px 12px;border:1px solid var(--border2);background:var(--white);border-radius:6px;font-size:.75rem;cursor:pointer;font-family:inherit;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
+
+<!-- CROÍ AUTH GATE -->
+<div class="croi-auth-gate" id="croiAuthGate">
+  <div class="croi-auth-card">
+    <div class="croi-auth-crest">C</div>
+
+    <div class="croi-auth-loading">
+      <div class="croi-auth-spin"></div>
+    </div>
+
+    <div class="croi-auth-noaccess" hidden>
+      <div class="croi-auth-title">No club found</div>
+      <div class="croi-auth-sub">You're signed in, but your account isn't linked to a club yet. Ask your club admin to add you.</div>
+      <button class="croi-auth-signout" id="croiSignOutBtn2">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- CROÍ SAVED SESSIONS MODAL -->
+<div class="croi-modal" id="croiSavedModal" hidden>
+  <div class="croi-modal-inner">
+    <div class="croi-modal-header">
+      <h2>Saved Sessions</h2>
+      <button class="croi-modal-close" id="croiSavedClose">✕</button>
+    </div>
+    <div class="croi-saved-list" id="croiSavedList"></div>
+  </div>
+</div>
+
+<div id="croiAppRoot" hidden>
 <div class="wrap">
 
   <!-- HEADER -->
@@ -436,6 +506,10 @@ header{
         <div class="header-id">
           <div class="header-title" id="hTitle">Session Builder</div>
           <div class="header-sub" id="hSub">CROÍ COACH</div>
+          <div class="croi-account">
+            <button class="croi-acc-btn" id="croiSavedOpenBtn">📁 Saved</button>
+            <button class="croi-acc-btn" id="croiSignOutBtn">Sign out</button>
+          </div>
         </div>
       </div>
       <div class="clock-area" id="clockArea">
@@ -537,9 +611,10 @@ header{
     </div>
     <div class="dots" id="dots"></div>
     <div class="action-bar">
-      <div class="action-row">
+      <div class="action-row" style="grid-template-columns:1fr 1fr 1fr 1.2fr">
         <button class="aBtn" id="copyBtn" onclick="copySession()">📋 Copy</button>
         <button class="aBtn" id="shareBtn" onclick="shareSession()">↑ Share</button>
+        <button class="aBtn" id="saveBtn" onclick="saveSessionToCroi()">💾 Save</button>
         <button class="aBtn primary" onclick="newSession()">＋ New</button>
       </div>
     </div>
@@ -556,6 +631,7 @@ header{
 </div>
 
 <div class="toast" id="toast"></div>
+</div>
 
 <script>
 // ── AI PROFILES & WORKFLOW CONFIGURATION ────────────────────────────────
@@ -1222,6 +1298,188 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1800);
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// ── CROÍ AUTH + SAVE/LIST (Supabase) ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+const CROI_TOOL = 'coach';
+const SUPABASE_URL = 'https://eoninhwffbppievxtnwi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_sP1Uj1dTMMRphINEUGV16g_8NsBWgQr';
+
+// Cookie-backed storage so the Supabase session is shared across every
+// *.croiclub.ie subdomain (coach./comms./clerk.). Falls back to a plain
+// per-host cookie when not running on croiclub.ie (e.g. local/preview URLs).
+const croiCookieDomain = /(^|\.)croiclub\.ie$/.test(location.hostname) ? '.croiclub.ie' : location.hostname;
+const croiCookieStorage = {
+  getItem(key) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + key.replace(/[-.$?*|{}()\[\]\\\/+^]/g, '\\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  },
+  setItem(key, value) {
+    document.cookie = `${key}=${encodeURIComponent(value)}; Domain=${croiCookieDomain}; Path=/; Max-Age=8640000; SameSite=Lax; Secure`;
+  },
+  removeItem(key) {
+    document.cookie = `${key}=; Domain=${croiCookieDomain}; Path=/; Max-Age=0; SameSite=Lax; Secure`;
+  }
+};
+
+const croiSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { storage: croiCookieStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+let croiSession = null;
+let croiClub = null; // { id, name, role, toolAdmin }
+
+function croiShowGate() { document.getElementById('croiAuthGate').hidden = false; document.getElementById('croiAppRoot').hidden = true; }
+function croiShowApp() { document.getElementById('croiAuthGate').hidden = true; document.getElementById('croiAppRoot').hidden = false; }
+
+// Login now happens on the portal (app.croiclub.ie), not in this tool — the gate
+// here only ever shows a loading spinner while the session is checked, or the
+// "no club found" state for a signed-in user with no club_members row.
+function croiSetGateState(state) {
+  const card = document.querySelector('.croi-auth-card');
+  card.querySelector('.croi-auth-loading').hidden = state !== 'loading';
+  const noAccess = card.querySelector('.croi-auth-noaccess');
+  if (noAccess) noAccess.hidden = state !== 'noaccess';
+}
+
+const CROI_PORTAL_URL = 'https://app.croiclub.ie/';
+
+function croiRedirectToPortal() {
+  window.location.href = CROI_PORTAL_URL + '?redirect=' + encodeURIComponent(location.href);
+}
+
+async function croiLoadClub(userId) {
+  const { data, error } = await croiSb
+    .from('club_members')
+    .select('club_id, role, tool_admin, clubs ( id, name )')
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+  if (error || !data) return null;
+  return { id: data.club_id, name: data.clubs?.name || 'Your club', role: data.role, toolAdmin: data.tool_admin || [] };
+}
+
+async function croiOnSignedIn(session) {
+  croiSession = session;
+  croiClub = await croiLoadClub(session.user.id);
+  if (!croiClub) {
+    croiShowGate();
+    croiSetGateState('noaccess');
+    return;
+  }
+  croiShowApp();
+}
+
+async function croiInitAuth() {
+  croiShowGate();
+  croiSetGateState('loading');
+  croiSb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) { croiOnSignedIn(session); }
+    if (event === 'SIGNED_OUT') { croiSession = null; croiClub = null; croiRedirectToPortal(); }
+  });
+  const { data: { session } } = await croiSb.auth.getSession();
+  if (session) { await croiOnSignedIn(session); }
+  else { croiRedirectToPortal(); }
+}
+
+async function croiSignOut() {
+  await croiSb.auth.signOut();
+}
+
+// ── SAVE ──
+async function croiSaveOutput(type, title, payload) {
+  if (!croiSession || !croiClub) return { error: { message: 'Not signed in' } };
+  const { error } = await croiSb.from('outputs').insert({
+    tool: CROI_TOOL,
+    type,
+    title: title || 'Untitled',
+    payload,
+    club_id: croiClub.id,
+    user_id: croiSession.user.id
+  });
+  return { error };
+}
+
+async function saveSessionToCroi() {
+  if (!sessionData) return;
+  const btn = document.getElementById('saveBtn');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const { error } = await croiSaveOutput('session', sessionData.title || 'Session', { session: sessionData, params: S });
+  btn.disabled = false;
+  btn.textContent = error ? original : '✓ Saved';
+  showToast(error ? 'Save failed — ' + error.message : 'Saved to your club ✓');
+  if (!error) setTimeout(() => { btn.textContent = original; }, 2000);
+}
+
+// ── LIST ──
+async function croiOpenSavedModal() {
+  document.getElementById('croiSavedModal').hidden = false;
+  const listEl = document.getElementById('croiSavedList');
+  listEl.innerHTML = '<div class="croi-saved-empty">Loading…</div>';
+  const { data, error } = await croiSb
+    .from('outputs')
+    .select('id, type, title, payload, created_at')
+    .eq('tool', CROI_TOOL)
+    .eq('club_id', croiClub.id)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) { listEl.innerHTML = `<div class="croi-saved-empty">Couldn't load saved sessions: ${croiEsc(error.message)}</div>`; return; }
+  if (!data || !data.length) { listEl.innerHTML = '<div class="croi-saved-empty">Nothing saved yet.</div>'; return; }
+  window.croiSavedData = data;
+  listEl.innerHTML = data.map((row, i) => `
+    <div class="croi-saved-item">
+      <button class="croi-saved-row" onclick="croiToggleSavedRow(${i})">
+        <span class="croi-saved-title">${croiEsc(row.title)}</span>
+        <span class="croi-saved-meta">${croiEsc(row.type)} · ${new Date(row.created_at).toLocaleDateString()}</span>
+      </button>
+      <div class="croi-saved-body" id="croiSavedBody${i}" hidden>
+        <div class="croi-saved-payload">${croiEsc(croiFormatPayload(row.payload))}</div>
+        <button class="croi-saved-copy" onclick="croiCopySavedPayload(${i})">📋 Copy</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function croiFormatPayload(payload) {
+  if (!payload) return '';
+  if (typeof payload === 'string') return payload;
+  try {
+    return Object.entries(payload).map(([k, v]) => `${k.toUpperCase()}\n${typeof v === 'string' ? v : JSON.stringify(v, null, 2)}`).join('\n\n');
+  } catch (e) { return JSON.stringify(payload, null, 2); }
+}
+
+function croiToggleSavedRow(i) {
+  const el = document.getElementById('croiSavedBody' + i);
+  if (el) el.hidden = !el.hidden;
+}
+
+function croiCopySavedPayload(i) {
+  croiCopyPlain(croiFormatPayload(window.croiSavedData[i].payload));
+  showToast('Copied ✓');
+}
+
+function croiCopyPlain(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  } catch (e) { if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {}); }
+}
+
+function croiEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  croiInitAuth();
+  document.getElementById('croiSignOutBtn')?.addEventListener('click', croiSignOut);
+  document.getElementById('croiSignOutBtn2')?.addEventListener('click', croiSignOut);
+  document.getElementById('croiSavedOpenBtn')?.addEventListener('click', croiOpenSavedModal);
+  document.getElementById('croiSavedClose')?.addEventListener('click', () => { document.getElementById('croiSavedModal').hidden = true; });
+});
 </script>
 </body>
 </html>
