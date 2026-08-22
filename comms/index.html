@@ -813,6 +813,8 @@ Generate THREE pieces of content. Return ONLY valid JSON, no markdown, no backti
 
   let croiSession = null;
   let croiClub = null; // { id, name, role, toolAdmin }
+  let croiHandledSessionKey = null; // access_token we've already run the club lookup for — de-dupes onAuthStateChange re-fires
+  let croiAuthWatchdog = null; // timeout id: bounces back to the portal if a lookup never settles
 
   function croiShowGate() { document.getElementById('croiAuthGate').hidden = false; document.getElementById('croiAppRoot').hidden = true; }
   function croiShowApp() { document.getElementById('croiAuthGate').hidden = true; document.getElementById('croiAppRoot').hidden = false; }
@@ -834,37 +836,97 @@ Generate THREE pieces of content. Return ONLY valid JSON, no markdown, no backti
   }
 
   async function croiLoadClub(userId) {
-    const { data, error } = await croiSb
+    // Hard timeout so a stalled request can't leave the gate spinning forever.
+    const query = croiSb
       .from('club_members')
       .select('club_id, role, tool_admin, clubs ( id, name )')
       .eq('user_id', userId)
       .limit(1)
       .maybeSingle();
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('croi-club-lookup-timeout')), 10000));
+    const { data, error } = await Promise.race([query, timeout]);
     if (error || !data) return null;
     return { id: data.club_id, name: data.clubs?.name || 'Your club', role: data.role, toolAdmin: data.tool_admin || [] };
   }
 
   async function croiOnSignedIn(session) {
+    // onAuthStateChange can hand us the same session more than once (an
+    // INITIAL_SESSION fire alongside a token refresh or a tab regaining
+    // focus) — without this guard each fire kicked off its own independent
+    // club_members query, which is what showed up as the same query
+    // repeating every few seconds while the gate never left "loading".
+    const key = session.access_token;
+    if (croiHandledSessionKey === key) return;
+    croiHandledSessionKey = key;
+
     croiSession = session;
-    croiClub = await croiLoadClub(session.user.id);
+    try {
+      croiClub = await croiLoadClub(session.user.id);
+    } catch (e) {
+      croiHandledSessionKey = null;
+      croiRedirectToPortal(); // let the portal's own retry/error UI handle it
+      return;
+    }
     if (!croiClub) {
       croiShowGate();
       croiSetGateState('noaccess');
       return;
     }
+    clearTimeout(croiAuthWatchdog);
     croiShowApp();
   }
 
   async function croiInitAuth() {
     croiShowGate();
     croiSetGateState('loading');
+
+    // Watchdog: if we're still stuck on the spinner after ~12s (a stalled
+    // request, a tab-lock that never released), bounce to the portal instead
+    // of leaving the user staring at a spinner with no way out.
+    croiAuthWatchdog = setTimeout(() => {
+      if (!document.getElementById('croiAuthGate').hidden &&
+          !document.querySelector('.croi-auth-loading').hidden) {
+        croiRedirectToPortal();
+      }
+    }, 12000);
+
     croiSb.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) { croiOnSignedIn(session); }
-      if (event === 'SIGNED_OUT') { croiSession = null; croiClub = null; croiRedirectToPortal(); }
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        croiOnSignedIn(session);
+      } else if (event === 'INITIAL_SESSION' && !session) {
+        clearTimeout(croiAuthWatchdog);
+        croiRedirectToPortal();
+      } else if (event === 'SIGNED_OUT') {
+        croiSession = null; croiClub = null; croiHandledSessionKey = null;
+        croiRedirectToPortal();
+      }
     });
-    const { data: { session } } = await croiSb.auth.getSession();
-    if (session) { await croiOnSignedIn(session); }
-    else { croiRedirectToPortal(); }
+
+    // Belt-and-braces: relying on onAuthStateChange's INITIAL_SESSION alone
+    // means a page load never resolves if that event is ever delayed or
+    // doesn't fire. Confirm directly — croiOnSignedIn() is de-duplicated by
+    // access_token so this can never double up a club lookup.
+    const { data: { session: croiInitSession } } = await croiSb.auth.getSession();
+    clearTimeout(croiAuthWatchdog);
+    if (croiInitSession) {
+      await croiOnSignedIn(croiInitSession);
+    } else if (!document.getElementById('croiAuthGate').hidden &&
+               !document.querySelector('.croi-auth-loading').hidden) {
+      croiRedirectToPortal();
+    }
+
+    // If the tab was backgrounded (e.g. switched away mid-check) and comes
+    // back still stuck loading, re-check rather than trusting a stalled
+    // in-flight call.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' &&
+          !document.getElementById('croiAuthGate').hidden &&
+          !document.querySelector('.croi-auth-loading').hidden) {
+        croiSb.auth.getSession().then(({ data: { session } }) => {
+          if (session) croiOnSignedIn(session); else croiRedirectToPortal();
+        });
+      }
+    });
   }
 
   async function croiSignOut() {

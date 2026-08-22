@@ -267,10 +267,77 @@
 
     [hidden] { display: none !important; }
     .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+    /* ── CROÍ AUTH GATE ── */
+    .croi-auth-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--navy),#081528);}
+    .croi-auth-card{width:100%;max-width:360px;background:var(--white);border-radius:14px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center;}
+    .croi-auth-crest{width:46px;height:46px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;margin:0 auto 14px;box-shadow:0 0 0 3px var(--gold-lt);}
+    .croi-auth-title{font-weight:800;font-size:1.1rem;color:var(--navy);margin-bottom:4px;}
+    .croi-auth-sub{font-size:.8125rem;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+    .croi-auth-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.9375rem;font-family:inherit;outline:none;margin-bottom:10px;}
+    .croi-auth-input:focus{border-color:var(--teal);}
+    .croi-auth-btn{width:100%;padding:12px;background:var(--navy);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:.9375rem;cursor:pointer;font-family:inherit;}
+    .croi-auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+    .croi-auth-msg{font-size:.8125rem;margin-top:10px;line-height:1.5;min-height:1px;}
+    .croi-auth-msg.error{color:var(--error-tx);}
+    .croi-auth-msg.ok{color:var(--green);}
+    .croi-auth-loading{display:flex;align-items:center;justify-content:center;padding:24px 0;}
+    .croi-auth-spin{width:22px;height:22px;border:3px solid rgba(13,31,60,.15);border-top-color:var(--navy);border-radius:50%;animation:croiSpin .7s linear infinite;}
+    @keyframes croiSpin{to{transform:rotate(360deg);}}
+    .croi-auth-signout{margin-top:16px;background:none;border:0;color:var(--muted);font-size:.8125rem;text-decoration:underline;cursor:pointer;font-family:inherit;}
+
+    .croi-account{display:flex;align-items:center;gap:6px;margin-top:8px;}
+    .croi-acc-btn{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:6px;padding:4px 9px;font-size:.625rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+    .croi-acc-btn:active{transform:scale(.96);}
+
+    .croi-modal{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;}
+    .croi-modal-inner{background:var(--white);width:100%;max-width:480px;max-height:80vh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;}
+    .croi-modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);flex:0 0 auto;}
+    .croi-modal-header h2{font-size:1rem;font-weight:800;color:var(--navy);}
+    .croi-modal-close{background:none;border:0;font-size:1.1rem;cursor:pointer;color:var(--muted);}
+    .croi-saved-list{overflow-y:auto;padding:8px 12px 16px;}
+    .croi-saved-empty{padding:20px;text-align:center;color:var(--muted);font-size:.875rem;}
+    .croi-saved-item{border-bottom:1px solid var(--border);}
+    .croi-saved-row{width:100%;text-align:left;background:none;border:0;padding:12px 4px;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:inherit;}
+    .croi-saved-title{font-weight:700;font-size:.875rem;color:var(--navy);}
+    .croi-saved-meta{font-size:.6875rem;color:var(--faint);text-transform:capitalize;}
+    .croi-saved-body{padding:0 4px 14px;}
+    .croi-saved-payload{white-space:pre-wrap;font-size:.75rem;line-height:1.5;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;max-height:240px;overflow-y:auto;}
+    .croi-saved-copy{margin-top:8px;padding:7px 12px;border:1px solid var(--border2);background:var(--white);border-radius:6px;font-size:.75rem;cursor:pointer;font-family:inherit;}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
+<!-- CROÍ AUTH GATE -->
+<div class="croi-auth-gate" id="croiAuthGate">
+  <div class="croi-auth-card">
+    <div class="croi-auth-crest">C</div>
+
+    <div class="croi-auth-loading">
+      <div class="croi-auth-spin"></div>
+    </div>
+
+    <div class="croi-auth-noaccess" hidden>
+      <div class="croi-auth-title">No club found</div>
+      <div class="croi-auth-sub">You're signed in, but your account isn't linked to a club yet. Ask your club admin to add you.</div>
+      <button class="croi-auth-signout" id="croiSignOutBtn2">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- CROÍ SAVED OUTPUTS MODAL -->
+<div class="croi-modal" id="croiSavedModal" hidden>
+  <div class="croi-modal-inner">
+    <div class="croi-modal-header">
+      <h2>Saved Outputs</h2>
+      <button class="croi-modal-close" id="croiSavedClose">✕</button>
+    </div>
+    <div class="croi-saved-list" id="croiSavedList"></div>
+  </div>
+</div>
+
+<div id="croiAppRoot" hidden>
 <header>
   <div class="header-inner">
     <div class="header-row">
@@ -281,6 +348,10 @@
       </div>
     </div>
     <div class="header-sub">Meetings · Correspondence · Grants · Ask Croí</div>
+    <div class="croi-account">
+      <button class="croi-acc-btn" id="croiSavedOpenBtn">📁 Saved</button>
+      <button class="croi-acc-btn" id="croiSignOutBtn">Sign out</button>
+    </div>
   </div>
 </header>
 
@@ -513,6 +584,7 @@
 
   <footer>Cro<span class="footer-accent">í</span> Clerk · Built for GAA volunteer clubs · Ceapex Limited</footer>
 </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -645,7 +717,7 @@ function renderMtgActions() {
   const actions = MTG_ACTIONS[mtg.type] || [];
   const grid = document.getElementById("mtg-action-grid");
   grid.innerHTML = actions.map(a =>
-    `<button class="tap-btn" onclick="mtgTap('action','${a}',this)">${a}</button>`
+    `<button class="tap-btn" data-val="${a}" onclick="mtgTapAction(this)">${a}</button>`
   ).join("");
   document.getElementById("mtg-action-section").hidden = false;
 }
@@ -654,9 +726,27 @@ function renderMtgAchieve() {
   const options = MTG_ACHIEVE[mtg.action] || [];
   const grid = document.getElementById("mtg-achieve-grid");
   grid.innerHTML = options.map(o =>
-    `<button class="tap-btn" onclick="mtgTap('achieve','${o}',this)">${o}</button>`
+    `<button class="tap-btn" data-val="${o}" onclick="mtgTapAchieve(this)">${o}</button>`
   ).join("");
   document.getElementById("mtg-achieve-section").hidden = false;
+}
+
+function mtgTapAction(btn) {
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  mtg.action = btn.dataset.val;
+  mtg.achieve = "";
+  renderMtgAchieve();
+  document.getElementById("mtg-fields").innerHTML = "";
+  document.getElementById("mtg-ctx-toggle").hidden = true;
+  document.getElementById("mtg-gen-btn").hidden = true;
+}
+
+function mtgTapAchieve(btn) {
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  mtg.achieve = btn.dataset.val;
+  renderMtgForm();
 }
 
 function renderMtgForm() {
@@ -690,6 +780,23 @@ function renderMtgForm() {
 }
 
 function renderAGMFields() {
+  const lengths   = ["Short (600 words)","Standard (900 words)","Comprehensive (1,300 words)"];
+  const sentiments= ["🟢 Excellent Year","🟢 Good Progress","🟡 Mixed Season","🔴 Challenging Year"];
+  const codes     = ["Men's Football","Hurling","Ladies Football","Camogie"];
+  const highlights= ["County title 🏆","Promoted","Reached a final","New sponsor","Pitch / facility upgrade","Grant received","New equipment","Increased membership","New coaches","Healthy Club","Cul Camp hosted","Successful fundraiser"];
+  const community = ["Schools coaching","Darkness Into Light","Gaelic4Mothers & Others","Charity event","Inclusion programme","All-abilities initiative"];
+  const schoolOpts= ["Strong","Ongoing","Developing"];
+  const priorities= ["Increase membership","More coaches","Facility upgrades","Grant funding","Improve communications","Develop juvenile section","Grow ladies football","Grow camogie","Healthy Club status","Referee recruitment"];
+  const thanks    = ["Coaches & mentors","Parents","Sponsors","Grounds committee","Lotto committee","Executive committee","County Board","Volunteers generally"];
+
+  function tapBtns(field, opts, multi) {
+    return opts.map(o => {
+      const safe = o.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+      const fn = multi ? `agmToggleBtn(this,'${field}')` : `agmTapBtn(this,'${field}')`;
+      return `<button class="tap-btn" data-val="${safe}" onclick="${fn}">${o}</button>`;
+    }).join("");
+  }
+
   return `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
       <div class="field" style="margin:0"><label class="field-label">Report Year</label>
@@ -698,74 +805,44 @@ function renderAGMFields() {
         <input type="text" placeholder="e.g. Máire Ní Bhriain" oninput="agmForm.secretary=this.value"/></div>
     </div>
     <div class="tap-group"><span class="tap-label">Report Length</span>
-      <div class="tap-grid c3">
-        ${["Short (600 words)","Standard (900 words)","Comprehensive (1,300 words)"].map(o =>
-          `<button class="tap-btn" onclick="agmTap('length','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid c3">${tapBtns("length", lengths, false)}</div></div>
     <div class="tap-group"><span class="tap-label">Season Sentiment</span>
-      <div class="tap-grid">
-        ${["🟢 Excellent Year","🟢 Good Progress","🟡 Mixed Season","🔴 Challenging Year"].map(o =>
-          `<button class="tap-btn" onclick="agmTap('sentiment','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("sentiment", sentiments, false)}</div></div>
     <hr class="divider"/>
     <div class="tap-group"><span class="tap-label">Active Codes</span>
-      <div class="tap-grid">
-        ${["Men's Football","Hurling","Ladies Football","Camogie"].map(o =>
-          `<button class="tap-btn" onclick="agmToggle('codes','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("codes", codes, true)}</div></div>
     <div class="tap-group"><span class="tap-label">Season Highlights</span>
-      <div class="tap-grid">
-        ${["County title 🏆","Promoted","Reached a final","New sponsor","Pitch / facility upgrade","Grant received","New equipment","Increased membership","New coaches","Healthy Club","Cul Camp hosted","Successful fundraiser"].map(o =>
-          `<button class="tap-btn" onclick="agmToggle('highlights','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("highlights", highlights, true)}</div></div>
     <div class="tap-group"><span class="tap-label">Community &amp; Inclusion</span>
-      <div class="tap-grid">
-        ${["Schools coaching","Darkness Into Light","Gaelic4Mothers&Others","Charity event","Inclusion programme","All-abilities initiative"].map(o =>
-          `<button class="tap-btn" onclick="agmToggle('community','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("community", community, true)}</div></div>
     <div class="tap-group"><span class="tap-label">School Links</span>
-      <div class="tap-grid c3">
-        ${["Strong","Ongoing","Developing"].map(o =>
-          `<button class="tap-btn" onclick="agmTap('schoolLinks','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid c3">${tapBtns("schoolLinks", schoolOpts, false)}</div></div>
     <hr class="divider"/>
     <div class="field"><label class="field-label">Anything else to mention? <span class="opt-note">(optional)</span></label>
       <textarea rows="2" placeholder="e.g. Senior footballers reached county semi-final. New gym opened in August." oninput="agmForm.extra=this.value"></textarea></div>
     <div class="tap-group"><span class="tap-label">Priorities for Next Year</span>
-      <div class="tap-grid">
-        ${["Increase membership","More coaches","Facility upgrades","Grant funding","Improve communications","Develop juvenile section","Grow ladies football","Grow camogie","Healthy Club status","Referee recruitment"].map(o =>
-          `<button class="tap-btn" onclick="agmToggle('priorities','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("priorities", priorities, true)}</div></div>
     <hr class="divider"/>
     <div class="tap-group"><span class="tap-label">Acknowledge</span>
-      <div class="tap-grid">
-        ${["Coaches & mentors","Parents","Sponsors","Grounds committee","Lotto committee","Executive committee","County Board","Volunteers generally"].map(o =>
-          `<button class="tap-btn" onclick="agmToggle('thanks','${o}',this)">${o}</button>`).join("")}
-      </div>
-    </div>
+      <div class="tap-grid">${tapBtns("thanks", thanks, true)}</div></div>
     <div class="field"><label class="field-label">In Memoriam <span class="opt-note">(optional)</span></label>
       <input type="text" placeholder="Names of deceased members to be remembered" oninput="agmForm.inMemoriam=this.value"/></div>
   `;
 }
 
-// AGM state
-const agmForm = {};
-function agmTap(f,v,btn) {
-  agmForm[f]=v;
-  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+function agmTapBtn(btn, field) {
+  const val = btn.dataset.val;
+  agmForm[field] = val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b => b.classList.remove("on"));
   btn.classList.add("on");
 }
-function agmToggle(f,v,btn) {
-  if(!agmForm[f]) agmForm[f]=[];
-  const i=agmForm[f].indexOf(v);
-  if(i>=0) agmForm[f].splice(i,1); else agmForm[f].push(v);
+
+function agmToggleBtn(btn, field) {
+  const val = btn.dataset.val;
+  if (!agmForm[field]) agmForm[field] = [];
+  const idx = agmForm[field].indexOf(val);
+  if (idx >= 0) agmForm[field].splice(idx, 1);
+  else agmForm[field].push(val);
   btn.classList.toggle("on");
 }
 
@@ -842,7 +919,13 @@ Return ONLY valid JSON:
       "Process Minutes":           [["📝 Minutes","minutes"],["✅ Action Items","actions"],["💬 WhatsApp Summary","whatsapp"]],
       "Annual Secretary's Report": [["📜 Secretary's Report","report"],["🎙️ Chair's Notes","chairNotes"],["📣 AGM Highlights","highlights"]]
     }[mtg.action] || [];
-    renderOutput("mtg-output", tabs, data);
+    const typeSlug = { "Generate Agenda":"agenda", "Process Minutes":"minutes", "Annual Secretary's Report":"agm_report" }[mtg.action] || "meeting";
+    const titleMap = {
+      "Generate Agenda": `Agenda — ${mtgFields.date || "Meeting"}`,
+      "Process Minutes": `Minutes — ${mtgFields.date || "Meeting"}`,
+      "Annual Secretary's Report": `Secretary's Report${agmForm.year ? " " + agmForm.year : ""}`
+    };
+    renderOutput("mtg-output", tabs, data, { type: typeSlug, title: titleMap[mtg.action] || "Meeting Output" });
   } catch(e) {
     showError("mtg-error", "Generation failed. Please check your connection and try again.");
   }
@@ -913,7 +996,8 @@ Return ONLY valid JSON: {"output": "The complete ${corr.format} text ready to us
     const text = await callOpenRouter(workflowKey, prompt);
     const data = parseJSON(text);
     const tabLabel = corr.format === "letter" ? "📄 Letter" : corr.format === "email" ? "📧 Email" : "💬 WhatsApp";
-    renderOutput("corr-output", [[tabLabel,"output"]], data);
+    const corrTitle = `${corr.format === "letter" ? "Letter" : corr.format === "email" ? "Email" : "WhatsApp"} to ${recipientLabel} — ${content.slice(0,50)}${content.length>50?'…':''}`;
+    renderOutput("corr-output", [[tabLabel,"output"]], data, { type: "correspondence_" + corr.format, title: corrTitle });
   } catch(e) {
     showError("corr-error","Generation failed. Please check your connection and try again.");
   }
@@ -941,7 +1025,19 @@ function gTap(field, val, btn) {
   btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");
 }
+function gTapBtn(btn, field) {
+  scForm[field] = btn.dataset.val;
+  btn.closest(".tap-grid").querySelectorAll(".tap-btn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+}
 function gMulti(field, val, btn) {
+  if(!scForm[field]) scForm[field]=[];
+  const i=scForm[field].indexOf(val);
+  if(i>=0) scForm[field].splice(i,1); else scForm[field].push(val);
+  btn.classList.toggle("on");
+}
+function gMultiBtn(btn, field) {
+  const val = btn.dataset.val;
   if(!scForm[field]) scForm[field]=[];
   const i=scForm[field].indexOf(val);
   if(i>=0) scForm[field].splice(i,1); else scForm[field].push(val);
@@ -964,7 +1060,7 @@ function renderSportsCapitalFields() {
       <input type="text" placeholder="e.g. Female Changing Facilities, Main Pitch Drainage" oninput="scForm.title=this.value"/></div>
     <div class="tap-group"><span class="tap-label">Project Type</span>
       <div class="tap-grid">
-        ${["Pitch Development","Floodlighting","Changing Rooms","Equipment","Gym Facilities","Drainage","Fencing","Other"].map(t=>`<button class="tap-btn" onclick="gTap('projectType','${t}',this)">${t}</button>`).join("")}
+        ${["Pitch Development","Floodlighting","Changing Rooms","Equipment","Gym Facilities","Drainage","Fencing","Other"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'projectType\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Amount Applying For (€)</label>
@@ -981,7 +1077,7 @@ function renderSportsCapitalFields() {
       <textarea rows="2" placeholder="e.g. Shared with local primary school twice weekly. Legal licence in place." oninput="scForm.sharing=this.value"></textarea></div>
     <div class="tap-group"><span class="tap-label">Land Ownership</span>
       <div class="tap-grid">
-        ${["Own freehold","Registered lease 15+ years","Registered lease under 15 years","Other/Not owned"].map(t=>`<button class="tap-btn" onclick="gTap('ownership','${t}',this)">${t}</button>`).join("")}
+        ${["Own freehold","Registered lease 15+ years","Registered lease under 15 years","Other/Not owned"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'ownership\')">${t}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -991,12 +1087,12 @@ function renderSEAIFields() {
     <div class="note-box"><strong>Note:</strong> The SEAI Community Energy Grant is managed through registered SEAI Project Coordinators — clubs do not apply directly. Use this tool to build your case and brief a registered coordinator.</div>
     <div class="tap-group"><span class="tap-label">Facility Being Upgraded</span>
       <div class="tap-grid">
-        ${["Pitch Floodlights","Main Clubhouse / Hall","Gym & Dressing Rooms","Whole Grounds"].map(t=>`<button class="tap-btn" onclick="gTap('seaiFacility','${t}',this)">${t}</button>`).join("")}
+        ${["Pitch Floodlights","Main Clubhouse / Hall","Gym & Dressing Rooms","Whole Grounds"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiFacility\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="tap-group"><span class="tap-label">Proposed Energy Upgrade</span>
       <div class="tap-grid">
-        ${["LED Pitch Lighting","Solar PV Roof Panels","Heat Pump System","Building Insulation / Windows","EV Charging Stations","Other"].map(t=>`<button class="tap-btn" onclick="gTap('seaiMeasure','${t}',this)">${t}</button>`).join("")}
+        ${["LED Pitch Lighting","Solar PV Roof Panels","Heat Pump System","Building Insulation / Windows","EV Charging Stations","Other"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiMeasure\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Estimated Total Cost (€)</label>
@@ -1005,14 +1101,14 @@ function renderSEAIFields() {
       <textarea rows="3" placeholder="e.g. 1980s clubhouse heated by old oil boiler. 20kW halogen pitch lights run 4 nights/week." oninput="scForm.seaiBaseline=this.value"></textarea></div>
     <div class="tap-group"><span class="tap-label">Expected Benefits</span>
       <div class="tap-grid">
-        ${["Lower electricity costs","Reduced carbon emissions","Better lighting quality","Improved building comfort","Reduced maintenance costs","Positive environmental example"].map(t=>`<button class="tap-btn" onclick="gMulti('seaiBenefits','${t}',this)">${t}</button>`).join("")}
+        ${["Lower electricity costs","Reduced carbon emissions","Better lighting quality","Improved building comfort","Reduced maintenance costs","Positive environmental example"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gMultiBtn(this,\'seaiBenefits\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Community Use of Facility</label>
       <textarea rows="2" placeholder="e.g. Primary school twice weekly, bingo Tuesday, Irish dancing Fridays" oninput="scForm.seaiCommunity=this.value"></textarea></div>
     <div class="tap-group"><span class="tap-label">Project Stage</span>
       <div class="tap-grid">
-        ${["Initial Idea","Quotes Being Obtained","Technical Assessment Complete","Working with SEAI / Energy Community Partner"].map(t=>`<button class="tap-btn" onclick="gTap('seaiContractor','${t}',this)">${t}</button>`).join("")}
+        ${["Initial Idea","Quotes Being Obtained","Technical Assessment Complete","Working with SEAI / Energy Community Partner"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'seaiContractor\')">${t}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -1026,14 +1122,14 @@ function renderLocalAuthorityFields() {
       <input type="text" placeholder="e.g. Juvenile Training Gear & All-Abilities Upgrades" oninput="scForm.laProject=this.value"/></div>
     <div class="tap-group"><span class="tap-label">Funding Category</span>
       <div class="tap-grid">
-        ${["Equipment Purchase","Facility Accessibility / Disability","Minor Building Repair","Inclusion / Social Project","Energy Efficiency Improvement"].map(t=>`<button class="tap-btn" onclick="gTap('laCategory','${t}',this)">${t}</button>`).join("")}
+        ${["Equipment Purchase","Facility Accessibility / Disability","Minor Building Repair","Inclusion / Social Project","Energy Efficiency Improvement"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'laCategory\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Grant Amount Requested (€)</label>
       <input type="text" placeholder="e.g. €4,500" oninput="scForm.laAmount=this.value"/></div>
     <div class="tap-group"><span class="tap-label">Target Beneficiaries</span>
       <div class="tap-grid">
-        ${["Juvenile / Underage Teams","Gaelic4Mothers & Others","Disability / All-Abilities","Senior Citizens","Wider Parish Community"].map(t=>`<button class="tap-btn" onclick="gMulti('laBeneficiaries','${t}',this)">${t}</button>`).join("")}
+        ${["Juvenile / Underage Teams","Gaelic4Mothers & Others","Disability / All-Abilities","Senior Citizens","Wider Parish Community"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gMultiBtn(this,'laBeneficiaries')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Project Description &amp; Local Need</label>
@@ -1042,7 +1138,7 @@ function renderLocalAuthorityFields() {
       <textarea rows="3" placeholder="How does this project support marginalised groups, increase female participation, or reduce barriers to sport?" oninput="scForm.laInclusion=this.value"></textarea></div>
     <div class="tap-group"><span class="tap-label">Quotes Status</span>
       <div class="tap-grid c3">
-        ${["3 Quotes Obtained","Single Quote / Specialist Equipment","Self-Funded Balance Ready"].map(t=>`<button class="tap-btn" onclick="gTap('laQuotes','${t}',this)">${t}</button>`).join("")}
+        ${["3 Quotes Obtained","Single Quote / Specialist Equipment","Self-Funded Balance Ready"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'laQuotes\')">${t}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -1052,12 +1148,12 @@ function renderProvincialFields() {
     <div class="note-box"><strong>Note:</strong> Provincial Council grant criteria vary by province and change annually. Always verify current requirements and caps with your County Board before applying.</div>
     <div class="tap-group"><span class="tap-label">Provincial Council</span>
       <div class="tap-grid">
-        ${["Leinster GAA","Munster GAA","Ulster GAA","Connacht GAA"].map(t=>`<button class="tap-btn" onclick="gTap('provCouncil','${t}',this)">${t}</button>`).join("")}
+        ${["Leinster GAA","Munster GAA","Ulster GAA","Connacht GAA"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provCouncil\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="tap-group"><span class="tap-label">Development Category</span>
       <div class="tap-grid">
-        ${["Pitch Construction / Drainage","Hurling / Ball Wall","New Dressing Rooms / Gym","Property / Land Purchase","Safety / Fencing"].map(t=>`<button class="tap-btn" onclick="gTap('provCategory','${t}',this)">${t}</button>`).join("")}
+        ${["Pitch Construction / Drainage","Hurling / Ball Wall","New Dressing Rooms / Gym","Property / Land Purchase","Safety / Fencing"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provCategory\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Total Project Cost (€)</label>
@@ -1066,12 +1162,12 @@ function renderProvincialFields() {
       <input type="text" placeholder="e.g. €20,000" oninput="scForm.provAmount=this.value"/></div>
     <div class="tap-group"><span class="tap-label">Vesting Status</span>
       <div class="tap-grid c3">
-        ${["Fully Vested in GAA","Vesting in Progress","Unvested"].map(t=>`<button class="tap-btn" onclick="gTap('provVesting','${t}',this)">${t}</button>`).join("")}
+        ${["Fully Vested in GAA","Vesting in Progress","Unvested"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provVesting\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="tap-group"><span class="tap-label">County Board Approval</span>
       <div class="tap-grid">
-        ${["Recommended & Signed","Pending County Board Meeting"].map(t=>`<button class="tap-btn" onclick="gTap('provBoard','${t}',this)">${t}</button>`).join("")}
+        ${["Recommended & Signed","Pending County Board Meeting"].map(t=>`<button class="tap-btn" data-val="${t}" onclick="gTapBtn(this,\'provBoard\')">${t}</button>`).join("")}
       </div>
     </div>
     <div class="field"><label class="field-label">Current Club Needs</label>
@@ -1152,12 +1248,19 @@ ${GRANT_OUTPUT_JSON.replace("...", "Compelling grant application 600-800 words")
   try {
     const text = await callOpenRouter(workflowKey, prompt);
     const data = parseJSON(text);
+    const grantTitleMap = {
+      "sports-capital": scForm.title || "Sports Capital Application",
+      "seai": "SEAI Energy Grant",
+      "local-authority": scForm.laProject || "Local Authority Grant",
+      "provincial": "Provincial GAA Grant",
+      "other": scForm.otherName || "Grant Application"
+    };
     renderOutput("grant-output", [
       ["📝 Project Summary","summary"],
       ["📄 Supporting Narrative","narrative"],
       ["☑️ Submission Checklist","checklist"],
       ["🔍 Croí Review","review"]
-    ], data);
+    ], data, { type: "grant_" + grantType, title: grantTitleMap[grantType] || "Grant Application" });
   } catch(e) {
     showError("grant-error","Generation failed. Please check your connection and try again.");
   }
@@ -1229,6 +1332,7 @@ Provide a clear, practical response written for a GAA club volunteer. Use plain 
         <div class="output-text">${escHtml(text)}</div>
         <div class="output-actions">
           <button class="action-btn" onclick="copyText(this, ${JSON.stringify(text)})">📋 Copy</button>
+          <button class="action-btn" id="ask-save-btn" onclick="saveAskToCroi(${JSON.stringify(text)})">💾 Save</button>
         </div>
       </div>`;
   } catch(e) {
@@ -1237,12 +1341,29 @@ Provide a clear, practical response written for a GAA club volunteer. Use plain 
   if (btn) { btn.disabled = false; btn.innerHTML = '🔍 Ask Croí'; }
 }
 
+async function saveAskToCroi(text) {
+  const btn = document.getElementById('ask-save-btn');
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const { error } = await croiSaveOutput('ask_croi', `Ask Croí — ${ask.action || 'response'}`, {
+    action: ask.action,
+    extra: document.getElementById('ask-extra')?.value || '',
+    response: text
+  });
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = error ? original : '✓ Saved';
+    if (error) showError('ask-error', 'Save failed: ' + error.message);
+    else setTimeout(() => { btn.textContent = original; }, 2000);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
 // ── OUTPUT RENDERING ──────────────────────────────────────
 // ═══════════════════════════════════════════════════════════
 let activeOutputTab = {};
 
-function renderOutput(containerId, tabs, data) {
+function renderOutput(containerId, tabs, data, meta) {
   const el = document.getElementById(containerId);
   activeOutputTab[containerId] = 0;
 
@@ -1259,11 +1380,13 @@ function renderOutput(containerId, tabs, data) {
       <div class="output-actions">
         <button class="action-btn" id="${containerId}-copy" onclick="copyOutput('${containerId}')">📋 Copy</button>
         <button class="action-btn" onclick="shareOutput('${containerId}')">↑ Share</button>
+        <button class="action-btn" id="${containerId}-save" onclick="saveOutputToCroi('${containerId}')">💾 Save</button>
       </div>
     </div>`;
 
   el._tabs = tabs;
   el._data = data;
+  el._meta = meta || {};
   el.style.display = "block";
   el.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -1281,6 +1404,23 @@ function selectOutputTab(containerId, i, btn) {
 function copyOutput(containerId) {
   const text = document.getElementById(`${containerId}-text`)?.textContent || "";
   copyText(document.getElementById(`${containerId}-copy`), text);
+}
+
+async function saveOutputToCroi(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el || !el._data) return;
+  const btn = document.getElementById(`${containerId}-save`);
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const meta = el._meta || {};
+  const { error } = await croiSaveOutput(meta.type || 'output', meta.title || 'Untitled', el._data);
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = error ? original : '✓ Saved';
+    if (!error) setTimeout(() => { btn.textContent = original; }, 2000);
+  }
+  const errId = containerId.replace('-output', '-error');
+  if (document.getElementById(errId)) showError(errId, error ? 'Save failed: ' + error.message : '');
 }
 
 function copyText(btn, text) {
@@ -1323,6 +1463,237 @@ function setLoading(btnId, loading) {
 function escHtml(s) {
   return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// ── CROÍ AUTH + SAVE/LIST (Supabase) ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+const CROI_TOOL = "clerk";
+const SUPABASE_URL = "https://eoninhwffbppievxtnwi.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sP1Uj1dTMMRphINEUGV16g_8NsBWgQr";
+
+// Cookie-backed storage so the Supabase session is shared across every
+// *.croiclub.ie subdomain (coach./comms./clerk.). Falls back to a plain
+// per-host cookie when not running on croiclub.ie (e.g. local/preview URLs).
+const croiCookieDomain = /(^|\.)croiclub\.ie$/.test(location.hostname) ? ".croiclub.ie" : location.hostname;
+const croiCookieStorage = {
+  getItem(key) {
+    const m = document.cookie.match(new RegExp("(?:^|; )" + key.replace(/[-.$?*|{}()\[\]\\\/+^]/g, "\\$&") + "=([^;]*)"));
+    return m ? decodeURIComponent(m[1]) : null;
+  },
+  setItem(key, value) {
+    document.cookie = `${key}=${encodeURIComponent(value)}; Domain=${croiCookieDomain}; Path=/; Max-Age=8640000; SameSite=Lax; Secure`;
+  },
+  removeItem(key) {
+    document.cookie = `${key}=; Domain=${croiCookieDomain}; Path=/; Max-Age=0; SameSite=Lax; Secure`;
+  }
+};
+
+const croiSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { storage: croiCookieStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+let croiSession = null;
+let croiClub = null; // { id, name, role, toolAdmin }
+let croiHandledSessionKey = null; // access_token we've already run the club lookup for — de-dupes onAuthStateChange re-fires
+let croiAuthWatchdog = null; // timeout id: bounces back to the portal if a lookup never settles
+
+function croiShowGate() { document.getElementById("croiAuthGate").hidden = false; document.getElementById("croiAppRoot").hidden = true; }
+function croiShowApp() { document.getElementById("croiAuthGate").hidden = true; document.getElementById("croiAppRoot").hidden = false; }
+
+// Login now happens on the portal (app.croiclub.ie), not in this tool — the gate
+// here only ever shows a loading spinner while the session is checked, or the
+// "no club found" state for a signed-in user with no club_members row.
+function croiSetGateState(state) {
+  const card = document.querySelector(".croi-auth-card");
+  card.querySelector(".croi-auth-loading").hidden = state !== "loading";
+  const noAccess = card.querySelector(".croi-auth-noaccess");
+  if (noAccess) noAccess.hidden = state !== "noaccess";
+}
+
+const CROI_PORTAL_URL = "https://app.croiclub.ie/";
+
+function croiRedirectToPortal() {
+  window.location.href = CROI_PORTAL_URL + "?redirect=" + encodeURIComponent(location.href);
+}
+
+async function croiLoadClub(userId) {
+  // Hard timeout so a stalled request can't leave the gate spinning forever.
+  const query = croiSb
+    .from("club_members")
+    .select("club_id, role, tool_admin, clubs ( id, name )")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("croi-club-lookup-timeout")), 10000));
+  const { data, error } = await Promise.race([query, timeout]);
+  if (error || !data) return null;
+  return { id: data.club_id, name: data.clubs?.name || "Your club", role: data.role, toolAdmin: data.tool_admin || [] };
+}
+
+async function croiOnSignedIn(session) {
+  // onAuthStateChange can hand us the same session more than once (an
+  // INITIAL_SESSION fire alongside a token refresh or a tab regaining
+  // focus) — without this guard each fire kicked off its own independent
+  // club_members query, which is what showed up as the same query
+  // repeating every few seconds while the gate never left "loading".
+  const key = session.access_token;
+  if (croiHandledSessionKey === key) return;
+  croiHandledSessionKey = key;
+
+  croiSession = session;
+  try {
+    croiClub = await croiLoadClub(session.user.id);
+  } catch (e) {
+    croiHandledSessionKey = null;
+    croiRedirectToPortal(); // let the portal's own retry/error UI handle it
+    return;
+  }
+  if (!croiClub) {
+    croiShowGate();
+    croiSetGateState("noaccess");
+    return;
+  }
+  clearTimeout(croiAuthWatchdog);
+  croiShowApp();
+}
+
+async function croiInitAuth() {
+  croiShowGate();
+  croiSetGateState("loading");
+
+  // Watchdog: if we're still stuck on the spinner after ~12s (a stalled
+  // request, a tab-lock that never released), bounce to the portal instead
+  // of leaving the user staring at a spinner with no way out.
+  croiAuthWatchdog = setTimeout(() => {
+    if (!document.getElementById("croiAuthGate").hidden &&
+        !document.querySelector(".croi-auth-loading").hidden) {
+      croiRedirectToPortal();
+    }
+  }, 12000);
+
+  croiSb.auth.onAuthStateChange((event, session) => {
+    if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+      croiOnSignedIn(session);
+    } else if (event === "INITIAL_SESSION" && !session) {
+      clearTimeout(croiAuthWatchdog);
+      croiRedirectToPortal();
+    } else if (event === "SIGNED_OUT") {
+      croiSession = null; croiClub = null; croiHandledSessionKey = null;
+      croiRedirectToPortal();
+    }
+  });
+
+  // Belt-and-braces: relying on onAuthStateChange's INITIAL_SESSION alone
+  // means a page load never resolves if that event is ever delayed or
+  // doesn't fire. Confirm directly — croiOnSignedIn() is de-duplicated by
+  // access_token so this can never double up a club lookup.
+  const { data: { session: croiInitSession } } = await croiSb.auth.getSession();
+  clearTimeout(croiAuthWatchdog);
+  if (croiInitSession) {
+    await croiOnSignedIn(croiInitSession);
+  } else if (!document.getElementById("croiAuthGate").hidden &&
+             !document.querySelector(".croi-auth-loading").hidden) {
+    croiRedirectToPortal();
+  }
+
+  // If the tab was backgrounded (e.g. switched away mid-check) and comes
+  // back still stuck loading, re-check rather than trusting a stalled
+  // in-flight call.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" &&
+        !document.getElementById("croiAuthGate").hidden &&
+        !document.querySelector(".croi-auth-loading").hidden) {
+      croiSb.auth.getSession().then(({ data: { session } }) => {
+        if (session) croiOnSignedIn(session); else croiRedirectToPortal();
+      });
+    }
+  });
+}
+
+async function croiSignOut() {
+  await croiSb.auth.signOut();
+}
+
+// ── SAVE ──
+async function croiSaveOutput(type, title, payload) {
+  if (!croiSession || !croiClub) return { error: { message: "Not signed in" } };
+  const { error } = await croiSb.from("outputs").insert({
+    tool: CROI_TOOL,
+    type,
+    title: title || "Untitled",
+    payload,
+    club_id: croiClub.id,
+    user_id: croiSession.user.id
+  });
+  return { error };
+}
+
+// ── LIST ──
+async function croiOpenSavedModal() {
+  document.getElementById("croiSavedModal").hidden = false;
+  const listEl = document.getElementById("croiSavedList");
+  listEl.innerHTML = '<div class="croi-saved-empty">Loading…</div>';
+  const { data, error } = await croiSb
+    .from("outputs")
+    .select("id, type, title, payload, created_at")
+    .eq("tool", CROI_TOOL)
+    .eq("club_id", croiClub.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) { listEl.innerHTML = `<div class="croi-saved-empty">Couldn't load saved outputs: ${croiEsc(error.message)}</div>`; return; }
+  if (!data || !data.length) { listEl.innerHTML = '<div class="croi-saved-empty">Nothing saved yet.</div>'; return; }
+  window.croiSavedData = data;
+  listEl.innerHTML = data.map((row, i) => `
+    <div class="croi-saved-item">
+      <button class="croi-saved-row" onclick="croiToggleSavedRow(${i})">
+        <span class="croi-saved-title">${croiEsc(row.title)}</span>
+        <span class="croi-saved-meta">${croiEsc(row.type)} · ${new Date(row.created_at).toLocaleDateString()}</span>
+      </button>
+      <div class="croi-saved-body" id="croiSavedBody${i}" hidden>
+        <div class="croi-saved-payload">${croiEsc(croiFormatPayload(row.payload))}</div>
+        <button class="croi-saved-copy" onclick="croiCopySavedPayload(${i})">📋 Copy</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function croiFormatPayload(payload) {
+  if (!payload) return "";
+  if (typeof payload === "string") return payload;
+  try {
+    return Object.entries(payload).map(([k, v]) => `${k.toUpperCase()}\n${typeof v === "string" ? v : JSON.stringify(v, null, 2)}`).join("\n\n");
+  } catch (e) { return JSON.stringify(payload, null, 2); }
+}
+
+function croiToggleSavedRow(i) {
+  const el = document.getElementById("croiSavedBody" + i);
+  if (el) el.hidden = !el.hidden;
+}
+
+function croiCopySavedPayload(i) {
+  croiCopyPlain(croiFormatPayload(window.croiSavedData[i].payload));
+}
+
+function croiCopyPlain(text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+  } catch (e) { if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {}); }
+}
+
+function croiEsc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  croiInitAuth();
+  document.getElementById("croiSignOutBtn")?.addEventListener("click", croiSignOut);
+  document.getElementById("croiSignOutBtn2")?.addEventListener("click", croiSignOut);
+  document.getElementById("croiSavedOpenBtn")?.addEventListener("click", croiOpenSavedModal);
+  document.getElementById("croiSavedClose")?.addEventListener("click", () => { document.getElementById("croiSavedModal").hidden = true; });
+});
 </script>
 </body>
 </html>
