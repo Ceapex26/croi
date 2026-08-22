@@ -451,6 +451,15 @@ const SUPABASE_ANON_KEY = 'sb_publishable_sP1Uj1dTMMRphINEUGV16g_8NsBWgQr';
 // Cookie-backed storage so the Supabase session is shared across every
 // *.croiclub.ie subdomain (coach./comms./clerk./app.). Falls back to a
 // plain per-host cookie when not running on croiclub.ie (e.g. local/preview URLs).
+//
+// Deliberately NOT localStorage: localStorage is scoped per-origin, so a
+// session written by coach.croiclub.ie would be invisible to app.croiclub.ie
+// (and vice versa) — switching would break the single-sign-on design this
+// portal depends on. It's also not needed for the magic-link redirect to
+// work: the SDK's detectSessionInUrl (below) parses the #access_token /
+// ?code straight out of the URL before it ever touches `storage` — the
+// adapter only decides where the already-parsed session gets persisted
+// afterwards, it has no bearing on whether the URL gets parsed.
 const croiCookieDomain = /(^|\.)croiclub\.ie$/.test(location.hostname) ? '.croiclub.ie' : location.hostname;
 const croiCookieStorage = {
   getItem(key) {
@@ -488,6 +497,24 @@ function croiIsAllowedRedirect(url) {
 function croiGetRedirectParam() {
   const raw = new URLSearchParams(location.search).get('redirect') || '';
   return raw && croiIsAllowedRedirect(raw) ? raw : '';
+}
+
+// supabase-js's detectSessionInUrl already parses the #access_token/
+// #refresh_token fragment (or a PKCE ?code=) out of the URL and sets the
+// session before getSession()/onAuthStateChange ever resolve — then cleans
+// the URL itself via history.replaceState. This is a redundant safety net
+// for stray auth params (e.g. ?error=/?error_description= from an expired
+// or already-used link) that the SDK doesn't clean up on its own, so
+// nothing sensitive-looking lingers visibly in the address bar. It never
+// touches the `redirect` param, which is still needed after this runs.
+function croiCleanAuthParamsFromUrl() {
+  const hasHashToken = /access_token|refresh_token|provider_token|type=/.test(window.location.hash);
+  const params = new URLSearchParams(window.location.search);
+  const hasQueryAuthParam = params.has('code') || params.has('error') || params.has('error_description');
+  if (!hasHashToken && !hasQueryAuthParam) return;
+  ['code', 'error', 'error_description', 'error_code'].forEach(p => params.delete(p));
+  const cleanSearch = params.toString();
+  history.replaceState(null, '', window.location.pathname + (cleanSearch ? '?' + cleanSearch : ''));
 }
 
 function croiShowGate() { document.getElementById('croiAuthGate').hidden = false; document.getElementById('croiAppRoot').hidden = true; }
@@ -621,6 +648,10 @@ async function croiInitAuth() {
   // 'form' when we're already showing 'form' is a harmless no-op.
   const { data: { session: croiInitSession } } = await croiSb.auth.getSession();
   clearTimeout(croiAuthWatchdog);
+  // Safe to clean up here and not before: getSession() awaiting means the
+  // SDK's own internal URL-parsing step has already finished, so this can't
+  // race it — croiInitSession above already reflects whatever the URL held.
+  croiCleanAuthParamsFromUrl();
   if (croiInitSession) {
     await croiOnSignedIn(croiInitSession);
   } else if (!document.getElementById('croiAuthGate').hidden &&
@@ -646,14 +677,16 @@ async function croiSendMagicLink() {
   if (!email) { croiSetGateState('error', 'Please enter your email address.'); return; }
   const btn = document.getElementById('croiAuthSendBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
-  // Bake the redirect target into the magic-link URL itself (rather than
-  // relying on localStorage) so it survives the round trip through email —
-  // the user might open the link on a different device or browser.
-  const redirect = croiGetRedirectParam();
-  const redirectTarget = location.origin + location.pathname + (redirect ? '?redirect=' + encodeURIComponent(redirect) : '');
+  // emailRedirectTo is just the current page URL: croiGetRedirectParam() already
+  // validated ?redirect= when this page loaded, so window.location.href carries
+  // it through unchanged — no need to reconstruct it. This survives the round
+  // trip through email (the user may open the link on a different device or
+  // browser) because it's baked into the link Supabase sends, not stored
+  // locally. croiIsAllowedRedirect() re-validates the param again on the way
+  // back out in croiGetRedirectParam(), so nothing here needs to re-derive it.
   const { error } = await croiSb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: redirectTarget }
+    options: { emailRedirectTo: window.location.href }
   });
   btn.disabled = false; btn.textContent = 'Send magic link';
   if (error) { croiSetGateState('error', error.message); return; }
