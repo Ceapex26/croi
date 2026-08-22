@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Croí — Digital tools for modern GAA clubs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #FFFFFF;
+      --surface:   #F7F8F6;
+      --border:    #E4E7E1;
+      --text:      #1A1A1A;
+      --muted:     #6B7280;
+      --green:     #1A5C38;
+      --green-lt:  #EBF2EE;
+      --gold:      #C9A84C;
+      --gold-lt:   #FDF6E3;
+      --gold-bd:   #E8D5A0;
+      --error:     #DC2626;
+      --radius:    10px;
+      --shadow:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-hv: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 48px 24px 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wordmark {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .wordmark span {
+      color: var(--gold);
+    }
+
+    .tagline {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── TOOL GRID ── */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    @media (min-width: 640px) {
+      .tool-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--border);
+      transition: background 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hv);
+      border-color: #C8D5CC;
+    }
+
+    .card:hover::before {
+      background: var(--green);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--green);
+      background: var(--green-lt);
+      border: 1px solid #C6DACC;
+      border-radius: 6px;
+      padding: 7px 14px;
+      text-decoration: none;
+      width: fit-content;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .card-btn:hover {
+      background: #DAEADE;
+      border-color: #A8C8B0;
+    }
+
+    .card-btn svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    /* ── COMING SOON ── */
+    .coming-soon-section {
+      margin-bottom: 48px;
+    }
+
+    .coming-card {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .coming-icon {
+      font-size: 1.375rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .coming-content {}
+
+    .coming-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .coming-desc {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 0 40px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    .footer-wordmark {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+
+    .footer-wordmark span { color: var(--gold); }
+
+    .footer-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── CROÍ ACCOUNT BAR ── */
+    .croi-account {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .croi-account-name {
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+    .croi-acc-btn {
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .croi-acc-btn:hover { background: var(--green-lt); border-color: #C6DACC; color: var(--green); }
+
+    /* ── CROÍ AUTH GATE ── */
+    .croi-auth-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#1A5C38,#0D3A22);}
+    .croi-auth-card{width:100%;max-width:360px;background:var(--bg);border-radius:14px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center;}
+    .croi-auth-crest{width:46px;height:46px;border-radius:50%;background:var(--green);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;margin:0 auto 14px;box-shadow:0 0 0 3px var(--gold-lt);}
+    .croi-auth-title{font-weight:800;font-size:1.1rem;color:var(--text);margin-bottom:4px;}
+    .croi-auth-sub{font-size:.8125rem;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+    .croi-auth-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.9375rem;font-family:inherit;outline:none;margin-bottom:10px;}
+    .croi-auth-input:focus{border-color:var(--green);}
+    .croi-auth-btn{width:100%;padding:12px;background:var(--green);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:.9375rem;cursor:pointer;font-family:inherit;}
+    .croi-auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+    .croi-auth-msg{font-size:.8125rem;margin-top:10px;line-height:1.5;min-height:1px;}
+    .croi-auth-msg.error{color:var(--error);}
+    .croi-auth-msg.ok{color:var(--green);}
+    .croi-auth-loading{display:flex;align-items:center;justify-content:center;padding:24px 0;}
+    .croi-auth-spin{width:22px;height:22px;border:3px solid rgba(26,92,56,.15);border-top-color:var(--green);border-radius:50%;animation:croiSpin .7s linear infinite;}
+    @keyframes croiSpin{to{transform:rotate(360deg);}}
+    .croi-auth-signout{margin-top:16px;background:none;border:0;color:var(--muted);font-size:.8125rem;text-decoration:underline;cursor:pointer;font-family:inherit;}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<!-- CROÍ AUTH GATE — this is the only login screen in the whole product now.
+     The three tools (coach/comms/clerk) just check for a session and bounce
+     here (with ?redirect=<their URL>) if there isn't one. -->
+<div class="croi-auth-gate" id="croiAuthGate">
+  <div class="croi-auth-card">
+    <div class="croi-auth-crest">C</div>
+
+    <div class="croi-auth-loading" id="croiAuthLoading">
+      <div class="croi-auth-spin"></div>
+    </div>
+
+    <div class="croi-auth-form" id="croiAuthForm" hidden>
+      <div class="croi-auth-title">Sign in to Croí</div>
+      <div class="croi-auth-sub" id="croiAuthFormSub">Enter your club email to continue.</div>
+      <input type="email" id="croiAuthEmail" class="croi-auth-input" placeholder="you@yourclub.ie" autocomplete="email" />
+      <button class="croi-auth-btn" id="croiAuthSendBtn">Send magic link</button>
+      <div class="croi-auth-msg error"></div>
+    </div>
+
+    <div class="croi-auth-sent" id="croiAuthSent" hidden>
+      <div class="croi-auth-title">Check your email</div>
+      <div class="croi-auth-sub">We've sent a sign-in link. Open it on this device to continue.</div>
+      <div class="croi-auth-msg ok"></div>
+    </div>
+
+    <div class="croi-auth-error" id="croiAuthErrorState" hidden>
+      <div class="croi-auth-title">Couldn't send link</div>
+      <div class="croi-auth-msg error"></div>
+      <button class="croi-auth-btn" onclick="croiRetryAuth()" style="margin-top:12px">Try again</button>
+    </div>
+
+    <div class="croi-auth-noaccess" id="croiAuthNoAccess" hidden>
+      <div class="croi-auth-title">No club found</div>
+      <div class="croi-auth-sub">You're signed in, but your account isn't linked to a club yet. Ask your club admin to add you.</div>
+      <button class="croi-auth-signout" id="croiSignOutBtn2">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<div id="croiAppRoot" hidden>
+
+  <!-- HEADER -->
+  <header>
+    <div class="wordmark">Cro<span>í</span></div>
+    <p class="tagline">Digital tools for modern GAA clubs.</p>
+    <div class="croi-account" id="croiAccountBar" hidden>
+      <span class="croi-account-name" id="croiClubName"></span>
+      <button class="croi-acc-btn" id="croiSignOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- TOOLS -->
+    <p class="section-label">Your tools</p>
+
+    <div class="tool-grid">
+
+      <!-- COACH -->
+      <div class="card">
+        <div class="card-icon">🏑</div>
+        <div class="card-name">Croí Coach</div>
+        <p class="card-desc">Generate complete, pathway-aligned training sessions in seconds — built specifically for Gaelic Games.</p>
+        <a class="card-btn" href="https://coach.croiclub.ie/" target="_blank" rel="noopener">
+          Open Coach
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- COMMS -->
+      <div class="card">
+        <div class="card-icon">📰</div>
+        <div class="card-name">Croí Comms</div>
+        <p class="card-desc">Generate match reports, social media posts and club communications — publish-ready in seconds.</p>
+        <a class="card-btn" href="https://comms.croiclub.ie/" target="_blank" rel="noopener">
+          Open Comms
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- CLERK -->
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-name">Croí Clerk</div>
+        <p class="card-desc">AI assistant for club secretaries — meeting minutes, correspondence and committee administration.</p>
+        <a class="card-btn" href="https://clerk.croiclub.ie/" target="_blank" rel="noopener">
+          Open Clerk
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M2 10L10 2M10 2H4M10 2v6"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- COMING SOON -->
+    <div class="coming-soon-section">
+      <p class="section-label">Coming soon</p>
+      <div class="coming-card">
+        <div class="coming-icon">🧠</div>
+        <div class="coming-content">
+          <div class="coming-name">Club Intelligence</div>
+          <p class="coming-desc">One AI assistant connected across coaching, communications and administration — understanding your club's context across every tool.</p>
+          <span class="badge">Launching 2027</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-wordmark">Cro<span>í</span></div>
+    <p class="footer-sub">Built for volunteer GAA clubs.</p>
+  </footer>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// ── CROÍ PORTAL AUTH (Supabase) ───────────────────────────────────────────
+// This page (app.croiclub.ie) is the ONLY place in the product with a login
+// screen. Croí Coach, Croí Comms and Croí Clerk each just check for an
+// active session and — if there isn't one — redirect here with
+// ?redirect=<the tool's own URL>. Once signed in (and confirmed to belong
+// to a club), we bounce the user straight back to wherever they came from.
+// If they landed here directly with no redirect param, they just see the
+// tool directory below.
+// ═══════════════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://eoninhwffbppievxtnwi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_sP1Uj1dTMMRphINEUGV16g_8NsBWgQr';
+
+// Cookie-backed storage so the Supabase session is shared across every
+// *.croiclub.ie subdomain (coach./comms./clerk./app.). Falls back to a
+// plain per-host cookie when not running on croiclub.ie (e.g. local/preview URLs).
+const croiCookieDomain = /(^|\.)croiclub\.ie$/.test(location.hostname) ? '.croiclub.ie' : location.hostname;
+const croiCookieStorage = {
+  getItem(key) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + key.replace(/[-.$?*|{}()\[\]\\\/+^]/g, '\\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  },
+  setItem(key, value) {
+    document.cookie = `${key}=${encodeURIComponent(value)}; Domain=${croiCookieDomain}; Path=/; Max-Age=8640000; SameSite=Lax; Secure`;
+  },
+  removeItem(key) {
+    document.cookie = `${key}=; Domain=${croiCookieDomain}; Path=/; Max-Age=0; SameSite=Lax; Secure`;
+  }
+};
+
+const croiSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { storage: croiCookieStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+let croiSession = null;
+let croiClub = null; // { id, name, role, toolAdmin }
+let croiHandledSessionKey = null; // access_token we've already run the club lookup for — de-dupes onAuthStateChange re-fires
+let croiAuthWatchdog = null; // timeout id: catches a stuck spinner if a lookup never settles
+
+// Only ever trust a redirect target that stays inside croiclub.ie — this
+// value comes from a URL query param, so without this check anyone could
+// craft an app.croiclub.ie link that bounces a signed-in user to an
+// arbitrary external site after they authenticate.
+function croiIsAllowedRedirect(url) {
+  try {
+    const u = new URL(url, location.origin);
+    return u.hostname === 'croiclub.ie' || u.hostname.endsWith('.croiclub.ie');
+  } catch (e) { return false; }
+}
+
+function croiGetRedirectParam() {
+  const raw = new URLSearchParams(location.search).get('redirect') || '';
+  return raw && croiIsAllowedRedirect(raw) ? raw : '';
+}
+
+function croiShowGate() { document.getElementById('croiAuthGate').hidden = false; document.getElementById('croiAppRoot').hidden = true; }
+function croiShowApp() { document.getElementById('croiAuthGate').hidden = true; document.getElementById('croiAppRoot').hidden = false; }
+
+function croiSetGateState(state, msg) {
+  const card = document.querySelector('.croi-auth-card');
+  card.querySelector('.croi-auth-loading').hidden = state !== 'loading';
+  card.querySelector('.croi-auth-form').hidden = state !== 'form';
+  card.querySelector('.croi-auth-sent').hidden = state !== 'sent';
+  card.querySelector('.croi-auth-error').hidden = state !== 'error';
+  const noAccess = card.querySelector('.croi-auth-noaccess');
+  if (noAccess) noAccess.hidden = state !== 'noaccess';
+  if (msg) {
+    const scope = card.querySelector(`.croi-auth-${state}`);
+    const el = scope && scope.querySelector('.croi-auth-msg');
+    if (el) el.textContent = msg;
+  }
+  if (state === 'form') {
+    const redirect = croiGetRedirectParam();
+    document.getElementById('croiAuthFormSub').textContent = redirect
+      ? 'Enter your club email to continue back to your tool.'
+      : 'Enter your club email to continue.';
+  }
+}
+
+async function croiLoadClub(userId) {
+  // Hard timeout so a stalled request (flaky mobile connection, a
+  // backgrounded tab resuming mid-fetch) can't leave the caller waiting
+  // forever — it surfaces as a rejected promise instead of a silent hang.
+  const query = croiSb
+    .from('club_members')
+    .select('club_id, role, tool_admin, clubs ( id, name )')
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('croi-club-lookup-timeout')), 10000));
+  const { data, error } = await Promise.race([query, timeout]);
+  if (error || !data) return null;
+  return { id: data.club_id, name: data.clubs?.name || 'Your club', role: data.role, toolAdmin: data.tool_admin || [] };
+}
+
+function croiFinishSignedIn() {
+  clearTimeout(croiAuthWatchdog);
+  document.getElementById('croiClubName').textContent = croiClub.name;
+  document.getElementById('croiAccountBar').hidden = false;
+  croiShowApp();
+  const redirect = croiGetRedirectParam();
+  if (redirect) {
+    window.location.href = redirect;
+  }
+}
+
+async function croiOnSignedIn(session) {
+  // onAuthStateChange can hand us the same session more than once (an
+  // INITIAL_SESSION fire alongside a SIGNED_IN fire from URL-based magic
+  // link detection, a tab regaining focus, a token refresh). Without this
+  // guard, each fire kicked off its own independent club_members query and
+  // its own redirect attempt — which is what showed up as the same query
+  // repeating every few seconds while the gate never left "loading".
+  const key = session.access_token;
+  if (croiHandledSessionKey === key) return;
+  croiHandledSessionKey = key;
+
+  croiSession = session;
+  try {
+    croiClub = await croiLoadClub(session.user.id);
+  } catch (e) {
+    croiHandledSessionKey = null; // allow croiRetryAuth() to try again
+    croiShowGate();
+    croiSetGateState('error', "That's taking too long — check your connection and try again.");
+    return;
+  }
+  if (!croiClub) {
+    croiShowGate();
+    croiSetGateState('noaccess');
+    return;
+  }
+  croiFinishSignedIn();
+}
+
+async function croiRetryAuth() {
+  croiSetGateState('loading');
+  clearTimeout(croiAuthWatchdog);
+  croiAuthWatchdog = setTimeout(croiAuthWatchdogFire, 12000);
+  const { data: { session } } = await croiSb.auth.getSession();
+  if (session) {
+    croiHandledSessionKey = null; // force a fresh lookup even if this token was already "handled"
+    await croiOnSignedIn(session);
+  } else {
+    clearTimeout(croiAuthWatchdog);
+    croiSetGateState('form');
+  }
+}
+
+function croiAuthWatchdogFire() {
+  if (!document.getElementById('croiAuthGate').hidden &&
+      !document.getElementById('croiAuthLoading').hidden) {
+    croiSetGateState('error', "This is taking longer than expected — please try again.");
+  }
+}
+
+async function croiInitAuth() {
+  croiShowGate();
+  croiSetGateState('loading');
+
+  // A watchdog on the very first load too: if getSession()/onAuthStateChange
+  // never settle (a stalled network request, a browser tab-lock that never
+  // released from a prior page), don't leave the user staring at a spinner
+  // with no way out.
+  croiAuthWatchdog = setTimeout(croiAuthWatchdogFire, 12000);
+
+  croiSb.auth.onAuthStateChange((event, session) => {
+    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+      croiOnSignedIn(session);
+    } else if (event === 'INITIAL_SESSION' && !session) {
+      clearTimeout(croiAuthWatchdog);
+      croiShowGate(); croiSetGateState('form');
+    } else if (event === 'SIGNED_OUT') {
+      croiSession = null; croiClub = null; croiHandledSessionKey = null;
+      document.getElementById('croiAccountBar').hidden = true;
+      croiShowGate(); croiSetGateState('form');
+    }
+  });
+
+  // Belt-and-braces: if the tab was backgrounded (e.g. the user switched to
+  // their email app to tap the magic link) and comes back still stuck on
+  // the spinner, re-check rather than trusting whatever was in flight.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' &&
+        !document.getElementById('croiAuthGate').hidden &&
+        !document.getElementById('croiAuthLoading').hidden) {
+      croiRetryAuth();
+    }
+  });
+}
+
+async function croiSendMagicLink() {
+  const emailInput = document.getElementById('croiAuthEmail');
+  const email = (emailInput.value || '').trim();
+  if (!email) { croiSetGateState('error', 'Please enter your email address.'); return; }
+  const btn = document.getElementById('croiAuthSendBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  // Bake the redirect target into the magic-link URL itself (rather than
+  // relying on localStorage) so it survives the round trip through email —
+  // the user might open the link on a different device or browser.
+  const redirect = croiGetRedirectParam();
+  const redirectTarget = location.origin + location.pathname + (redirect ? '?redirect=' + encodeURIComponent(redirect) : '');
+  const { error } = await croiSb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectTarget }
+  });
+  btn.disabled = false; btn.textContent = 'Send magic link';
+  if (error) { croiSetGateState('error', error.message); return; }
+  croiSetGateState('sent', `A sign-in link is on its way to ${email}.`);
+}
+
+async function croiSignOut() {
+  await croiSb.auth.signOut();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  croiInitAuth();
+  document.getElementById('croiAuthSendBtn')?.addEventListener('click', croiSendMagicLink);
+  document.getElementById('croiAuthEmail')?.addEventListener('keydown', e => { if (e.key === 'Enter') croiSendMagicLink(); });
+  document.getElementById('croiSignOutBtn')?.addEventListener('click', croiSignOut);
+  document.getElementById('croiSignOutBtn2')?.addEventListener('click', croiSignOut);
+});
+</script>
+
+</body>
+</html>
