@@ -613,6 +613,21 @@ async function croiInitAuth() {
     }
   });
 
+  // Belt-and-braces: relying on onAuthStateChange's INITIAL_SESSION alone
+  // means a plain visit with no session never resolves if that event is
+  // ever delayed or doesn't fire (an older cached supabase-js build, a slow
+  // network). Confirm directly — croiOnSignedIn() is de-duplicated by
+  // access_token so this can never double up a club lookup, and setting
+  // 'form' when we're already showing 'form' is a harmless no-op.
+  const { data: { session: croiInitSession } } = await croiSb.auth.getSession();
+  clearTimeout(croiAuthWatchdog);
+  if (croiInitSession) {
+    await croiOnSignedIn(croiInitSession);
+  } else if (!document.getElementById('croiAuthGate').hidden &&
+             !document.getElementById('croiAuthLoading').hidden) {
+    croiShowGate(); croiSetGateState('form');
+  }
+
   // Belt-and-braces: if the tab was backgrounded (e.g. the user switched to
   // their email app to tap the magic link) and comes back still stuck on
   // the spinner, re-check rather than trusting whatever was in flight.
