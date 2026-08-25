@@ -483,6 +483,30 @@ let croiClub = null; // { id, name, role, toolAdmin }
 let croiHandledSessionKey = null; // access_token we've already run the club lookup for — de-dupes onAuthStateChange re-fires
 let croiAuthWatchdog = null; // timeout id: catches a stuck spinner if a lookup never settles
 
+// Explicitly check the URL for auth params — a magic-link #access_token (+
+// #refresh_token) fragment, or a PKCE ?code= — and wait for Supabase JS to
+// establish the session from them before any other auth logic runs.
+//
+// detectSessionInUrl:true (set on the client above) means the SDK already
+// starts exchanging these the moment the client is constructed, above. We
+// deliberately don't re-parse the tokens/code and call setSession()/
+// exchangeCodeForSession() ourselves here — a PKCE ?code= can only be
+// exchanged once, so a second, manual exchange would just fail (and race)
+// against the SDK's own in-flight one. Calling getSession() is the correct
+// "explicit" step: it awaits that in-flight exchange and hands back the
+// resulting session, so nothing below ever runs against a stale
+// not-signed-in state while the URL's tokens are still being processed.
+// This is entirely client-side — no server callback, no Pro-plan custom
+// auth domain, works as-is on the free tier.
+async function croiEstablishSessionFromUrl() {
+  const hasHashToken = /access_token=/.test(window.location.hash);
+  const hasCode = new URLSearchParams(window.location.search).has('code');
+  if (!hasHashToken && !hasCode) return null;
+  const { data: { session }, error } = await croiSb.auth.getSession();
+  if (error) console.error('Croí auth: failed to establish session from URL', error);
+  return session;
+}
+
 // Only ever trust a redirect target that stays inside croiclub.ie — this
 // value comes from a URL query param, so without this check anyone could
 // craft an app.croiclub.ie link that bounces a signed-in user to an
@@ -697,7 +721,10 @@ async function croiSignOut() {
   await croiSb.auth.signOut();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Establish (or confirm there is no) session from the URL's auth params
+  // before anything else on the page runs.
+  await croiEstablishSessionFromUrl();
   croiInitAuth();
   document.getElementById('croiAuthSendBtn')?.addEventListener('click', croiSendMagicLink);
   document.getElementById('croiAuthEmail')?.addEventListener('keydown', e => { if (e.key === 'Enter') croiSendMagicLink(); });
